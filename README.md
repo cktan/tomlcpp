@@ -35,22 +35,20 @@ if (!server) {
 }
 
 // get value from the table
-auto host = server->getValue("host");
-if (!host) {
-    handle_error("missing host entry");
+auto hostval = server->getValue("host");
+string* hoststr;
+if (!hostval || !(hoststr = hostval->toString())) {
+    handle_error("missing or bad host entry");
 }
-auto port = server.getValue("port");
-if (!port) {
-   handle_error("missing port entry");
+auto portval = server.getValue("port");
+int* port;
+if (!portval || !(port = portval->toInt())) {
+   handle_error("missing or bad port entry");
 }
 
 // examine the values
-auto hostpair = host->toString();
-if (hostpair.first)
-   cout << "server.host is " << hostpair.second << "\n";
+cout << "server.host is " << *hoststr << "\n";
+cout << "server.port is " << *port << "\n";
 
-auto portpair = port->toInt();
-if (portpair.first)
-   cout << "server.port is " << portpair.second << "\n";
 
 ```
