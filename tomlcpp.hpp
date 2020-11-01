@@ -46,11 +46,11 @@ namespace toml {
 	class Value {
 		public:
 		// extract string, bool, etc from Value.
-		std::string* toString() const;
-		bool* toBool() const;
-		int64_t* toInt() const;
-		double* toDouble() const;
-		Timestamp* toTimestamp() const;
+		std::pair<bool, std::string> toString() const;
+		std::pair<bool, bool> toBool() const;
+		std::pair<bool, int64_t> toInt() const;
+		std::pair<bool, double> toDouble() const;
+		std::pair<bool, Timestamp> toTimestamp() const;
 
 		Value(const char* raw, std::shared_ptr<Backing> backing)
 			: m_raw(raw), m_backing(backing) {}
@@ -58,14 +58,6 @@ namespace toml {
 		private:
 		const char* m_raw;
 		std::shared_ptr<Backing> m_backing;
-
-		mutable std::string strval;
-		union {
-			mutable bool boolval;
-			mutable int64_t intval;
-			mutable double doubleval;
-		};
-		mutable	Timestamp timestampval;
 		
 		Value() = delete;
 		Value(Value&) = delete;

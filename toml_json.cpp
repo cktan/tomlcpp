@@ -79,9 +79,9 @@ static void print(const toml::Value& v)
 {
 	{
 		auto s = v.toString();
-		if (s) {
+		if (s.first) {
 			cout << "{\"type\":\"string\",\"value\":\"";
-			print_escape_string(*s);
+			print_escape_string(s.second);
 			cout << "\"}";
 			return;
 		}
@@ -89,9 +89,9 @@ static void print(const toml::Value& v)
 
 	{
 		auto i = v.toInt();
-		if (i) {
+		if (i.first) {
 			cout << "{\"type\":\"integer\",\"value\":\"";
-			cout << *i;
+			cout << i.second;
 			cout << "\"}";
 			return;
 		}
@@ -99,53 +99,54 @@ static void print(const toml::Value& v)
 
 	{
 		auto b = v.toBool();
-		if (b) {
-			cout << "{\"type\":\"bool\",\"value\":\"" << *b << "\"}";
+		if (b.first) {
+			cout << "{\"type\":\"bool\",\"value\":\"" << b.second << "\"}";
 			return;
 		}
 	}
 
 	{
 		auto d = v.toDouble();
-		if (d) {
-			cout << "{\"type\":\"float\",\"value\":\"" << *d << "\"}";
+		if (d.first) {
+			cout << "{\"type\":\"float\",\"value\":\"" << d.second << "\"}";
 			return;
 		}
 	}
 
 	{
 		auto ts = v.toTimestamp();
-		if (ts) {
-			if (ts->year != -1 && ts->hour != -1) {
+		if (ts.first) {
+			auto& t = ts.second;
+			if (t.year != -1 && t.hour != -1) {
 				cout << "{\"type\":\"datetime\",\"value\":\"";
-				cout << z4(ts->year);
-				cout << "-" << z2(ts->month);
-				cout << "-" << z2(ts->day);
-				cout << "T" << z2(ts->hour);
-				cout << ":" << z2(ts->minute);
-				cout << ":" << z2(ts->second);
-				if (ts->millisec != -1) 
-					cout << "." << ts->millisec;
-				cout << ts->z << "\"}";
+				cout << z4(t.year);
+				cout << "-" << z2(t.month);
+				cout << "-" << z2(t.day);
+				cout << "T" << z2(t.hour);
+				cout << ":" << z2(t.minute);
+				cout << ":" << z2(t.second);
+				if (t.millisec != -1) 
+					cout << "." << t.millisec;
+				cout << t.z << "\"}";
 				return;
 			}
 
-			if (ts->year != -1) {
+			if (t.year != -1) {
 				cout << "{\"type\":\"date\",\"value\":\"";
-				cout << z4(ts->year);
-				cout << "-" << z2(ts->month);
-				cout << "-" << z2(ts->day);
+				cout << z4(t.year);
+				cout << "-" << z2(t.month);
+				cout << "-" << z2(t.day);
 				cout << "\"}";
 				return;
 			}
 
-			if (ts->hour != -1) {
+			if (t.hour != -1) {
 				cout << "{\"type\":\"time\",\"value\":\"";
-				cout << z2(ts->hour);
-				cout << ":" << z2(ts->minute);
-				cout << ":" << z2(ts->second);
-				if (ts->millisec != -1) 
-					cout << "." << ts->millisec;
+				cout << z2(t.hour);
+				cout << ":" << z2(t.minute);
+				cout << ":" << z2(t.second);
+				if (t.millisec != -1) 
+					cout << "." << t.millisec;
 				cout << "\"}";
 				return;
 			}

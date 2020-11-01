@@ -21,48 +21,55 @@ struct toml::Backing {
 	}
 };
 
-string* Value::toString() const
+std::pair<bool, string> Value::toString() const
 {
+	string str;
 	char* s;
-	if (toml_rtos(m_raw, &s)) return 0;
-	strval = s;
-	free(s);
-	return &strval;
+	bool ok = (0 == toml_rtos(m_raw, &s));
+	if (ok) {
+		str = s;
+		free(s);
+	}
+	return {ok, str};
 }
 
-bool* Value::toBool() const
+std::pair<bool, bool> Value::toBool() const
 {
 	int b;
-	if (toml_rtob(m_raw, &b)) return 0;
-	boolval = !!b;
-	return &boolval;
+	bool ok = (0 == toml_rtob(m_raw, &b));
+	return {ok, !!b};
 }
 
-int64_t* Value::toInt() const
+std::pair<bool, int64_t> Value::toInt() const
 {
-	if (toml_rtoi(m_raw, &intval)) return 0;
-	return &intval;
+	int64_t i;
+	bool ok = (0 == toml_rtoi(m_raw, &i));
+	return {ok, i};
 }
 
-double* Value::toDouble() const
+std::pair<bool, double> Value::toDouble() const
 {
-	if (toml_rtod(m_raw, &doubleval)) return 0;
-	return &doubleval;
+	double d;
+	bool ok = (0 == toml_rtod(m_raw, &d));
+	return {ok, d};
 }
 
 
-Timestamp* Value::toTimestamp() const
+std::pair<bool, Timestamp> Value::toTimestamp() const
 {
 	toml_timestamp_t ts;
-	if (toml_rtots(m_raw, &ts)) return 0;
-	timestampval.year = (ts.year ? *ts.year : -1);
-	timestampval.month = (ts.month ? *ts.month : -1);
-	timestampval.day = (ts.day ? *ts.day : -1);
-	timestampval.hour = (ts.hour ? *ts.hour : -1);
-	timestampval.second = (ts.second ? *ts.second : -1);
-	timestampval.millisec = (ts.millisec ? *ts.millisec : -1);
-	timestampval.z = ts.z ? string(ts.z) : "";
-	return &timestampval;
+	Timestamp ret;
+	bool ok = (0 == toml_rtots(m_raw, &ts));
+	if (ok) {
+		ret.year = (ts.year ? *ts.year : -1);
+		ret.month = (ts.month ? *ts.month : -1);
+		ret.day = (ts.day ? *ts.day : -1);
+		ret.hour = (ts.hour ? *ts.hour : -1);
+		ret.second = (ts.second ? *ts.second : -1);
+		ret.millisec = (ts.millisec ? *ts.millisec : -1);
+		ret.z = ts.z ? string(ts.z) : "";
+	}
+	return {ok, ret};
 }
 
 
