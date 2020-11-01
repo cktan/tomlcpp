@@ -36,6 +36,7 @@ prefix ?= /usr/local
 install: all
 	install -d ${prefix}/include ${prefix}/lib
 	install toml.h ${prefix}/include
+	install toml.hpp ${prefix}/include
 	install $(LIB) ${prefix}/lib
 	install $(LIB_SHARED) ${prefix}/lib
 
