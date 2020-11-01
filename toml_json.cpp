@@ -79,9 +79,9 @@ static void print(const toml::Value& v)
 {
 	{
 		auto s = v.toString();
-		if (s.first) {
+		if (s) {
 			cout << "{\"type\":\"string\",\"value\":\"";
-			print_escape_string(s.second);
+			print_escape_string(*s);
 			cout << "\"}";
 			return;
 		}
@@ -89,9 +89,9 @@ static void print(const toml::Value& v)
 
 	{
 		auto i = v.toInt();
-		if (i.first) {
+		if (i) {
 			cout << "{\"type\":\"integer\",\"value\":\"";
-			cout << i.second;
+			cout << *i;
 			cout << "\"}";
 			return;
 		}
@@ -99,54 +99,53 @@ static void print(const toml::Value& v)
 
 	{
 		auto b = v.toBool();
-		if (b.first) {
-			cout << "{\"type\":\"bool\",\"value\":\"" << b.second << "\"}";
+		if (b) {
+			cout << "{\"type\":\"bool\",\"value\":\"" << *b << "\"}";
 			return;
 		}
 	}
 
 	{
 		auto d = v.toDouble();
-		if (d.first) {
-			cout << "{\"type\":\"float\",\"value\":\"" << d.second << "\"}";
+		if (d) {
+			cout << "{\"type\":\"float\",\"value\":\"" << *d << "\"}";
 			return;
 		}
 	}
 
 	{
 		auto ts = v.toTimestamp();
-		if (ts.first) {
-			auto t = ts.second;
-			if (t.year != -1 && t.hour != -1) {
+		if (ts) {
+			if (ts->year != -1 && ts->hour != -1) {
 				cout << "{\"type\":\"datetime\",\"value\":\"";
-				cout << z4(t.year);
-				cout << "-" << z2(t.month);
-				cout << "-" << z2(t.day);
-				cout << "T" << z2(t.hour);
-				cout << ":" << z2(t.minute);
-				cout << ":" << z2(t.second);
-				if (t.millisec != -1) 
-					cout << "." << t.millisec;
-				cout << t.z << "\"}";
+				cout << z4(ts->year);
+				cout << "-" << z2(ts->month);
+				cout << "-" << z2(ts->day);
+				cout << "T" << z2(ts->hour);
+				cout << ":" << z2(ts->minute);
+				cout << ":" << z2(ts->second);
+				if (ts->millisec != -1) 
+					cout << "." << ts->millisec;
+				cout << ts->z << "\"}";
 				return;
 			}
 
-			if (t.year != -1) {
+			if (ts->year != -1) {
 				cout << "{\"type\":\"date\",\"value\":\"";
-				cout << z4(t.year);
-				cout << "-" << z2(t.month);
-				cout << "-" << z2(t.day);
+				cout << z4(ts->year);
+				cout << "-" << z2(ts->month);
+				cout << "-" << z2(ts->day);
 				cout << "\"}";
 				return;
 			}
 
-			if (t.hour != -1) {
+			if (ts->hour != -1) {
 				cout << "{\"type\":\"time\",\"value\":\"";
-				cout << z2(t.hour);
-				cout << ":" << z2(t.minute);
-				cout << ":" << z2(t.second);
-				if (t.millisec != -1) 
-					cout << "." << t.millisec;
+				cout << z2(ts->hour);
+				cout << ":" << z2(ts->minute);
+				cout << ":" << z2(ts->second);
+				if (ts->millisec != -1) 
+					cout << "." << ts->millisec;
 				cout << "\"}";
 				return;
 			}
@@ -241,9 +240,11 @@ static void print(const toml::Array& curarr)
 static void cat(std::istream& stream)
 {
 	std::string str(std::istreambuf_iterator<char>{stream}, {});
+	/*
 	cout << "---------------\n";
 	cout << str << "\n";
 	cout << "---------------\n";
+	*/
 	auto result = toml::parse(str);
 	if (!result.table) {
 		cerr << "ERROR: " << result.errmsg << '\n';

@@ -21,54 +21,48 @@ struct toml::Backing {
 	}
 };
 
-std::pair<bool, string> Value::toString() const
+string* Value::toString() const
 {
 	char* s;
-	if (toml_rtos(m_raw, &s))
-		return std::make_pair(false, "");
-
-	string ss(s);
+	if (toml_rtos(m_raw, &s)) return 0;
+	strval = s;
 	free(s);
-	return std::make_pair(true, ss);
+	return &strval;
 }
 
-std::pair<bool, bool> Value::toBool() const
+bool* Value::toBool() const
 {
 	int b;
-	bool ok = (0 == toml_rtob(m_raw, &b));
-	return std::make_pair(ok, !!b);
+	if (toml_rtob(m_raw, &b)) return 0;
+	boolval = !!b;
+	return &boolval;
 }
 
-std::pair<bool, int64_t> Value::toInt() const
+int64_t* Value::toInt() const
 {
-	int64_t i;
-	bool ok = (0 == toml_rtoi(m_raw, &i));
-	return std::make_pair(ok, i);
+	if (toml_rtoi(m_raw, &intval)) return 0;
+	return &intval;
 }
 
-std::pair<bool, double> Value::toDouble() const
+double* Value::toDouble() const
 {
-	double d;
-	bool ok = (0 == toml_rtod(m_raw, &d));
-	return std::make_pair(ok, d);
+	if (toml_rtod(m_raw, &doubleval)) return 0;
+	return &doubleval;
 }
 
 
-std::pair<bool, Timestamp> Value::toTimestamp() const
+Timestamp* Value::toTimestamp() const
 {
-	Timestamp ret;
 	toml_timestamp_t ts;
-	bool ok = (0 == toml_rtots(m_raw, &ts));
-	if (ok) {
-		ret.year = (ts.year ? *ts.year : -1);
-		ret.month = (ts.month ? *ts.month : -1);
-		ret.day = (ts.day ? *ts.day : -1);
-		ret.hour = (ts.hour ? *ts.hour : -1);
-		ret.second = (ts.second ? *ts.second : -1);
-		ret.millisec = (ts.millisec ? *ts.millisec : -1);
-		ret.z = ts.z ? string(ts.z) : "";
-	}
-	return std::make_pair(ok, ret);
+	if (toml_rtots(m_raw, &ts)) return 0;
+	timestampval.year = (ts.year ? *ts.year : -1);
+	timestampval.month = (ts.month ? *ts.month : -1);
+	timestampval.day = (ts.day ? *ts.day : -1);
+	timestampval.hour = (ts.hour ? *ts.hour : -1);
+	timestampval.second = (ts.second ? *ts.second : -1);
+	timestampval.millisec = (ts.millisec ? *ts.millisec : -1);
+	timestampval.z = ts.z ? string(ts.z) : "";
+	return &timestampval;
 }
 
 
