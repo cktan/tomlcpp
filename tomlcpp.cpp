@@ -2,11 +2,24 @@
 #include <vector>
 #include "tomlcpp.hpp"
 #include "toml.h"
-#include <stdlib.h>
 #include <string.h>
 
 using namespace toml;
 using std::string;
+
+/**
+ *  Keep track of memory to be freed when all references
+ *  to the tree returned by toml::parse is no longer reachable.
+ */
+struct toml::Backing {
+	char* ptr;
+	toml_table_t* root;
+	Backing(char* p) : ptr(p) {}
+	~Backing() {
+		free(ptr);
+		if (root) toml_free(root);
+	}
+};
 
 std::pair<bool, string> Value::toString() const
 {
@@ -58,11 +71,6 @@ std::pair<bool, Timestamp> Value::toTimestamp() const
 	return std::make_pair(ok, ret);
 }
 
-Table::~Table()
-{
-	free(m_backing);
-}
-
 
 std::unique_ptr<Value> Table::getValue(const string& key) const
 {
@@ -70,8 +78,7 @@ std::unique_ptr<Value> Table::getValue(const string& key) const
 	if (!r)
 		return 0;
 	
-	auto ret = std::make_unique<Value>(r);
-	ret->__set_root(m_root);
+	auto ret = std::make_unique<Value>(r, m_backing);
 	return ret;
 }
 
@@ -82,8 +89,7 @@ std::unique_ptr<Array> Table::getArray(const string& key) const
 	if (!a)
 		return 0;
 
-	auto ret = std::make_unique<Array>(a);
-	ret->__set_root(m_root);
+	auto ret = std::make_unique<Array>(a, m_backing);
 	return ret;
 }
 
@@ -93,8 +99,7 @@ std::unique_ptr<Table> Table::getTable(const string& key) const
 	if (!t)
 		return 0;
 
-	auto ret = std::make_unique<Table>(t);
-	ret->__set_root(m_root);
+	auto ret = std::make_unique<Table>(t, m_backing);
 	return ret;
 }
 
@@ -126,8 +131,7 @@ std::unique_ptr<Value> Array::getValue(int idx) const
 	if (!r)
 		return 0;
 	
-	auto ret = std::make_unique<Value>(r);
-	ret->__set_root(m_root);
+	auto ret = std::make_unique<Value>(r, m_backing);
 	return ret;
 }
 
@@ -137,8 +141,7 @@ std::unique_ptr<Array> Array::getArray(int idx) const
 	if (!a)
 		return 0;
 
-	auto ret = std::make_unique<Array>(a);
-	ret->__set_root(m_root);
+	auto ret = std::make_unique<Array>(a, m_backing);
 	return ret;
 }
 
@@ -148,8 +151,7 @@ std::unique_ptr<Table> Array::getTable(int idx) const
 	if (!t)
 		return 0;
 
-	auto ret = std::make_unique<Table>(t);
-	ret->__set_root(m_root);
+	auto ret = std::make_unique<Table>(t, m_backing);
 	return ret;
 }
 
@@ -163,12 +165,12 @@ toml::ParserResult toml::parse(const string& conf)
 		ret.errmsg = "out of memory";
 		return ret;
 	}
+	auto backing = std::make_shared<Backing>(s);
 	
 	toml_table_t* t = toml_parse(s, errbuf, sizeof(errbuf));
 	if (t) {
-		ret.table = std::make_shared<Table>(t);
-		ret.table->__set_root(ret.table);
-		ret.table->__set_backing(s);
+		ret.table = std::make_shared<Table>(t, backing);
+		backing->root = t;
 	} else {
 		ret.errmsg = (*errbuf) ? string(errbuf) : "unknown error";
 	}

@@ -29,68 +29,67 @@ struct toml_table_t;
 struct toml_array_t;
 
 namespace toml {
-	
+
+	struct Backing;
 	class Value;
 	class Array;
 	class Table;
 
+	/* A Timestamp value */
 	struct Timestamp {
 		// -1 means it is not valid
 		int year, month, day, hour, minute, second, millisec;
-		std::string z;
+		std::string z;			// "" if no timezone
 	};
 
+	/* A value in toml. Can be string/bool/int/double or timestamp. */
 	class Value {
 		public:
-		Value(const char* raw) : m_raw(raw) {}
-
+		// extract string, bool, etc from Value.
+		// first: ok indicator. second: the value in proper type.
 		std::pair<bool, std::string> toString() const;
 		std::pair<bool, bool> toBool() const;
 		std::pair<bool, int64_t> toInt() const;
 		std::pair<bool, double> toDouble() const;
 		std::pair<bool, Timestamp> toTimestamp() const;
 
-		// do not use
-		void __set_root(std::shared_ptr<Table> root) { m_root = root; }
+		Value(const char* raw, std::shared_ptr<Backing> backing)
+			: m_raw(raw), m_backing(backing) {}
+
+		private:
+		const char* m_raw;
+		std::shared_ptr<Backing> m_backing;
 		
-		protected:
-		std::shared_ptr<Table> m_root;
-		const char* m_raw = 0;
+		Value() = delete;
+		Value(Value&) = delete;
+		Value& operator=(Value&) = delete;
 	};
 
 
+	/* A table in toml. You can extract value/table/array using a key. */
 	class Table {
 		public:
-		Table() = delete;
-		Table(toml_table_t* t) : m_table(t) {}
-		Table(Table&) = delete;
-		Table& operator=(Table&) = delete;
-		~Table();
-
 		std::vector<std::string> keys() const;
 
 		std::unique_ptr<Value> getValue(const std::string& key) const;
 		std::unique_ptr<Table> getTable(const std::string& key) const;
 		std::unique_ptr<Array> getArray(const std::string& key) const;
 
-		// do not use
-		void __set_root(std::shared_ptr<Table> root) { m_root = root; }
-		void __set_backing(char* s) { m_backing = s; }
+		Table(toml_table_t* t, std::shared_ptr<Backing> backing) : m_table(t), m_backing(backing) {}
 		
 		private:
-		std::shared_ptr<Table> m_root;
 		toml_table_t* const m_table = 0;
-		char* m_backing = 0;		// this will only be set in the root Table
+		std::shared_ptr<Backing> m_backing;
+		
+		Table() = delete;
+		Table(Table&) = delete;
+		Table& operator=(Table&) = delete;
 	};
 
 
+	/* An array in toml. You can extract value/table/array using an index. */
 	class Array {
 		public:
-		Array(toml_array_t* a) : m_array(a) {}
-		Array() = delete;
-		Array(Array&) = delete;
-		Array& operator=(Array&) = delete;
-		~Array() {}
 
 		// Content kind
 		// t:table, a:array, v:value
@@ -104,12 +103,15 @@ namespace toml {
 		std::unique_ptr<Table> getTable(int idx) const;
 		std::unique_ptr<Array> getArray(int idx) const;
 
-		// do not use
-		void __set_root(std::shared_ptr<Table> root) { m_root = root; }
+		Array(toml_array_t* a, std::shared_ptr<Backing> backing) : m_array(a), m_backing(backing) {}
 		
 		private:
-		std::shared_ptr<Table> m_root;
 		toml_array_t* const m_array = 0;
+		std::shared_ptr<Backing> m_backing;
+		
+		Array() = delete;
+		Array(Array&) = delete;
+		Array& operator=(Array&) = delete;
 	};
 
 
