@@ -34,6 +34,7 @@
 using namespace toml;
 using std::string;
 using std::vector;
+using std::pair;
 
 /**
  *  Keep track of memory to be freed when all references
@@ -49,58 +50,8 @@ struct toml::Backing {
 	}
 };
 
-std::pair<bool, string> Value::toString() const
-{
-	string str;
-	char* s;
-	bool ok = (0 == toml_rtos(m_raw, &s));
-	if (ok) {
-		str = s;
-		free(s);
-	}
-	return {ok, str};
-}
 
-std::pair<bool, bool> Value::toBool() const
-{
-	int b;
-	bool ok = (0 == toml_rtob(m_raw, &b));
-	return {ok, !!b};
-}
-
-std::pair<bool, int64_t> Value::toInt() const
-{
-	int64_t i;
-	bool ok = (0 == toml_rtoi(m_raw, &i));
-	return {ok, i};
-}
-
-std::pair<bool, double> Value::toDouble() const
-{
-	double d;
-	bool ok = (0 == toml_rtod(m_raw, &d));
-	return {ok, d};
-}
-
-
-std::pair<bool, Timestamp> Value::toTimestamp() const
-{
-	toml_timestamp_t ts;
-	Timestamp ret;
-	bool ok = (0 == toml_rtots(m_raw, &ts));
-	if (ok) {
-		ret.year = (ts.year ? *ts.year : -1);
-		ret.month = (ts.month ? *ts.month : -1);
-		ret.day = (ts.day ? *ts.day : -1);
-		ret.hour = (ts.hour ? *ts.hour : -1);
-		ret.second = (ts.second ? *ts.second : -1);
-		ret.millisec = (ts.millisec ? *ts.millisec : -1);
-		ret.z = ts.z ? string(ts.z) : "";
-	}
-	return {ok, ret};
-}
-
-std::pair<bool, std::string> Table::getString(const string& key) const
+pair<bool, string> Table::getString(const string& key) const
 {
 	string str;
 	bool ok = 0;
@@ -116,7 +67,7 @@ std::pair<bool, std::string> Table::getString(const string& key) const
 	return {ok, str};
 }
 
-std::pair<bool, bool> Table::getBool(const string& key) const
+pair<bool, bool> Table::getBool(const string& key) const
 {
 	int b = 0;
 	bool ok = 0;
@@ -128,7 +79,7 @@ std::pair<bool, bool> Table::getBool(const string& key) const
 	
 }
 
-std::pair<bool, int64_t> Table::getInt(const string& key) const
+pair<bool, int64_t> Table::getInt(const string& key) const
 {
 	int64_t i = 0;
 	bool ok = 0;
@@ -140,7 +91,7 @@ std::pair<bool, int64_t> Table::getInt(const string& key) const
 	
 }
 
-std::pair<bool, double> Table::getDouble(const string& key) const
+pair<bool, double> Table::getDouble(const string& key) const
 {
 	double d = 0;
 	bool ok = 0;
@@ -151,7 +102,7 @@ std::pair<bool, double> Table::getDouble(const string& key) const
 	return {ok, d};
 }
 
-std::pair<bool, Timestamp> Table::getTimestamp(const string& key) const
+pair<bool, Timestamp> Table::getTimestamp(const string& key) const
 {
 	Timestamp ret;
 	bool ok = 0;
@@ -172,16 +123,6 @@ std::pair<bool, Timestamp> Table::getTimestamp(const string& key) const
 	return {ok, ret};
 }
 
-
-std::unique_ptr<Value> Table::getValue(const string& key) const
-{
-	toml_raw_t r = toml_raw_in(m_table, key.c_str());
-	if (!r)
-		return 0;
-	
-	auto ret = std::make_unique<Value>(r, m_backing);
-	return ret;
-}
 
 
 std::unique_ptr<Array> Table::getArray(const string& key) const
@@ -224,16 +165,6 @@ char Array::kind() const
 char Array::type() const
 {
 	return toml_array_type(m_array);
-}
-
-std::unique_ptr<Value> Array::getValue(int idx) const
-{
-	toml_raw_t r = toml_raw_at(m_array, idx);
-	if (!r)
-		return 0;
-	
-	auto ret = std::make_unique<Value>(r, m_backing);
-	return ret;
 }
 
 std::unique_ptr<Array> Array::getArray(int idx) const
@@ -368,7 +299,7 @@ std::unique_ptr< vector<double> > Array::getDoubleVector() const
 }
 
 
-int toml::Array::getSize() const
+int toml::Array::size() const
 {
 	return toml_array_nelem(m_array);
 }
@@ -404,7 +335,7 @@ toml::ParserResult toml::parseFile(const string& path)
 		ret.errmsg = strerror(errno);
 		return ret;
 	}
-	std::string conf(std::istreambuf_iterator<char>{stream}, {});
+	string conf(std::istreambuf_iterator<char>{stream}, {});
 	return toml::parse(conf);
 }
 

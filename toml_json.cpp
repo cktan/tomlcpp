@@ -170,17 +170,6 @@ static bool print(pair<bool, toml::Timestamp> v)
 	return true;
 }
 
-static void print(const toml::Value& v)
-{
-	if (print(v.toString())) return;
-	if (print(v.toInt())) return;
-	if (print(v.toBool())) return;
-	if (print(v.toDouble())) return;
-	if (print(v.toTimestamp())) return;
-	cerr << "unknown type\n";
-	exit(1);
-}
-
 
 static void print(const toml::Array& arr);
 static void print(const toml::Table& curtab)
@@ -263,6 +252,8 @@ static void print(const toml::Array& curarr)
 		return;
 	}
 
+	
+	cout << "{\"type\":\"array\",\"value\":[";
 	{
 		auto v = curarr.getStringVector();
 		if (v) {
@@ -272,6 +263,7 @@ static void print(const toml::Array& curarr)
 				print(s);
 				first = 0;
 			}
+			cout << "]}";
 			return;
 		}
 	}
@@ -285,6 +277,7 @@ static void print(const toml::Array& curarr)
 				print(s);
 				first = 0;
 			}
+			cout << "]}";
 			return;
 		}
 	}
@@ -297,6 +290,7 @@ static void print(const toml::Array& curarr)
 				cout << (i == 0 ? "" : ",");
 				print((*v)[i]);
 			}
+			cout << "]}";
 			return;
 		}
 	}
@@ -311,6 +305,7 @@ static void print(const toml::Array& curarr)
 				print(s);
 				first = 0;
 			}
+			cout << "]}";
 			return;
 		}
 	}
@@ -324,35 +319,12 @@ static void print(const toml::Array& curarr)
 				print(s);
 				first = 0;
 			}
+			cout << "]}";
 			return;
 		}
 	}
 
-		
-
-	
-
-				
-
-	
-	switch (curarr.kind()) {
-
-	case 'v':
-		for (int i = 0; ; i++) {
-			auto v = curarr.getValue(i);
-			if (!v) break;
-			if (i) cout << ",";
-			print(*v);
-		}
-		break;
-
-	case 'a': 
-		break;
-
-	default:
-		break;
-	}
-	cout << "]}";
+	abort();
 }
 
 

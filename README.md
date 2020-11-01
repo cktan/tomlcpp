@@ -35,13 +35,11 @@ if (!server) {
 }
 
 // get value from the table
-auto hostval = server->getValue("host");
-auto host = hostval ? hostval->toString() : pair<bool, string>();
+auto host = server->getString("host");
 if (!host.first) {
     handle_error("missing or bad host entry");
 }
-auto portval = server.getValue("port");
-auto port = portval ? portval->toInt() : pair<bool, int64_t>();
+auto port = server->getInt("port");
 if (!port.first) {
    handle_error("missing or bad port entry");
 }

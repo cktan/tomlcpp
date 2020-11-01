@@ -31,9 +31,11 @@ struct toml_array_t;
 namespace toml {
 
 	struct Backing;
-	class Value;
 	class Array;
 	class Table;
+	using std::pair;
+	using std::string;
+	using std::vector;
 
 	/* A Timestamp value */
 	struct Timestamp {
@@ -45,47 +47,24 @@ namespace toml {
 		int minute = -1;
 		int second = -1;
 		int millisec = -1;
-		std::string z;			// "" if no timezone
+		string z;			// "" if no timezone
 	};
-
-	/* A value in toml. Can be string/bool/int/double or timestamp. */
-	class Value {
-		public:
-		// extract string, bool, etc from Value.
-		std::pair<bool, std::string> toString() const;
-		std::pair<bool, bool> toBool() const;
-		std::pair<bool, int64_t> toInt() const;
-		std::pair<bool, double> toDouble() const;
-		std::pair<bool, Timestamp> toTimestamp() const;
-
-		Value(const char* raw, std::shared_ptr<Backing> backing)
-			: m_raw(raw), m_backing(backing) {}
-
-		private:
-		const char* m_raw;
-		std::shared_ptr<Backing> m_backing;
-		
-		Value() = delete;
-		Value(Value&) = delete;
-		Value& operator=(Value&) = delete;
-	};
-
 
 	/* A table in toml. You can extract value/table/array using a key. */
 	class Table {
 		public:
-		std::vector<std::string> keys() const;
+		vector<string> keys() const;
 
-		std::pair<bool, std::string> getString(const std::string& key) const;
-		std::pair<bool, bool>        getBool(const std::string& key) const;
-		std::pair<bool, int64_t>     getInt(const std::string& key) const;
-		std::pair<bool, double>      getDouble(const std::string& key) const;
-		std::pair<bool, Timestamp>   getTimestamp(const std::string& key) const;
+		// get content
+		pair<bool, string>     getString(const string& key) const;
+		pair<bool, bool>       getBool(const string& key) const;
+		pair<bool, int64_t>    getInt(const string& key) const;
+		pair<bool, double>     getDouble(const string& key) const;
+		pair<bool, Timestamp>  getTimestamp(const string& key) const;
+		std::unique_ptr<Table> getTable(const string& key) const;
+		std::unique_ptr<Array> getArray(const string& key) const;
 
-		std::unique_ptr<Value> getValue(const std::string& key) const;
-		std::unique_ptr<Table> getTable(const std::string& key) const;
-		std::unique_ptr<Array> getArray(const std::string& key) const;
-
+		// internal
 		Table(toml_table_t* t, std::shared_ptr<Backing> backing) : m_table(t), m_backing(backing) {}
 		
 		private:
@@ -111,20 +90,18 @@ namespace toml {
 		char type() const;
 
 		// Return the #elements in the array
-		int getSize() const;
+		int size() const;
 
 		// For values, some conveniet methods to obtain vector of values
-		std::unique_ptr< std::vector<std::string> > getStringVector() const;
-		std::unique_ptr< std::vector<bool> >        getBoolVector() const;
-		std::unique_ptr< std::vector<int64_t> >     getIntVector() const;
-		std::unique_ptr< std::vector<double> >      getDoubleVector() const;
-		std::unique_ptr< std::vector<Timestamp> >   getTimestampVector() const;
+		std::unique_ptr< vector<string> >     getStringVector() const;
+		std::unique_ptr< vector<bool> >       getBoolVector() const;
+		std::unique_ptr< vector<int64_t> >    getIntVector() const;
+		std::unique_ptr< vector<double> >     getDoubleVector() const;
+		std::unique_ptr< vector<Timestamp> >  getTimestampVector() const;
 
 		// Regular access methods
-		std::unique_ptr<Value> getValue(int idx) const;
 		std::unique_ptr<Table> getTable(int idx) const;
 		std::unique_ptr<Array> getArray(int idx) const;
-		
 
 		// internal
 		Array(toml_array_t* a, std::shared_ptr<Backing> backing) : m_array(a), m_backing(backing) {}
@@ -142,11 +119,11 @@ namespace toml {
 	/* The main function: Parse */
 	struct ParserResult {
 		std::shared_ptr<Table> table;
-		std::string errmsg;
+		string errmsg;
 	};
 
-	ParserResult parse(const std::string& conf);
-	ParserResult parseFile(const std::string& path);
+	ParserResult parse(const string& conf);
+	ParserResult parseFile(const string& path);
 };
 
 
