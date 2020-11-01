@@ -38,7 +38,13 @@ namespace toml {
 	/* A Timestamp value */
 	struct Timestamp {
 		// -1 means it is not valid
-		int year, month, day, hour, minute, second, millisec;
+		int year = -1;
+		int month = -1;
+		int day = -1;
+		int hour = -1;
+		int minute = -1;
+		int second = -1;
+		int millisec = -1;
 		std::string z;			// "" if no timezone
 	};
 
@@ -70,6 +76,12 @@ namespace toml {
 		public:
 		std::vector<std::string> keys() const;
 
+		std::pair<bool, std::string> getString(const std::string& key) const;
+		std::pair<bool, bool>        getBool(const std::string& key) const;
+		std::pair<bool, int64_t>     getInt(const std::string& key) const;
+		std::pair<bool, double>      getDouble(const std::string& key) const;
+		std::pair<bool, Timestamp>   getTimestamp(const std::string& key) const;
+
 		std::unique_ptr<Value> getValue(const std::string& key) const;
 		std::unique_ptr<Table> getTable(const std::string& key) const;
 		std::unique_ptr<Array> getArray(const std::string& key) const;
@@ -97,11 +109,24 @@ namespace toml {
 		// For Value kind only, check the type of the value
 		// i:int, d:double, b:bool, s:string, t:time, D: date, T:timestamp, 0:unknown
 		char type() const;
-		
+
+		// Return the #elements in the array
+		int getSize() const;
+
+		// For values, some conveniet methods to obtain vector of values
+		std::unique_ptr< std::vector<std::string> > getStringVector() const;
+		std::unique_ptr< std::vector<bool> >        getBoolVector() const;
+		std::unique_ptr< std::vector<int64_t> >     getIntVector() const;
+		std::unique_ptr< std::vector<double> >      getDoubleVector() const;
+		std::unique_ptr< std::vector<Timestamp> >   getTimestampVector() const;
+
+		// Regular access methods
 		std::unique_ptr<Value> getValue(int idx) const;
 		std::unique_ptr<Table> getTable(int idx) const;
 		std::unique_ptr<Array> getArray(int idx) const;
+		
 
+		// internal
 		Array(toml_array_t* a, std::shared_ptr<Backing> backing) : m_array(a), m_backing(backing) {}
 		
 		private:

@@ -33,6 +33,7 @@
 
 using namespace toml;
 using std::string;
+using std::vector;
 
 /**
  *  Keep track of memory to be freed when all references
@@ -99,6 +100,78 @@ std::pair<bool, Timestamp> Value::toTimestamp() const
 	return {ok, ret};
 }
 
+std::pair<bool, std::string> Table::getString(const string& key) const
+{
+	string str;
+	bool ok = 0;
+	const char* raw = toml_raw_in(m_table, key.c_str());
+	if (raw) {
+		char* s;
+		ok = (0 == toml_rtos(raw, &s));
+		if (ok) {
+			str = s;
+			free(s);
+		}
+	}
+	return {ok, str};
+}
+
+std::pair<bool, bool> Table::getBool(const string& key) const
+{
+	int b = 0;
+	bool ok = 0;
+	const char* raw = toml_raw_in(m_table, key.c_str());
+	if (raw) {
+		ok = (0 == toml_rtob(raw, &b));
+	}
+	return {ok, !!b};
+	
+}
+
+std::pair<bool, int64_t> Table::getInt(const string& key) const
+{
+	int64_t i = 0;
+	bool ok = 0;
+	const char* raw = toml_raw_in(m_table, key.c_str());
+	if (raw) {
+		ok = (0 == toml_rtoi(raw, &i));
+	}
+	return {ok, i};
+	
+}
+
+std::pair<bool, double> Table::getDouble(const string& key) const
+{
+	double d = 0;
+	bool ok = 0;
+	const char* raw = toml_raw_in(m_table, key.c_str());
+	if (raw) {
+		ok = (0 == toml_rtod(raw, &d));
+	}
+	return {ok, d};
+}
+
+std::pair<bool, Timestamp> Table::getTimestamp(const string& key) const
+{
+	Timestamp ret;
+	bool ok = 0;
+	const char* raw = toml_raw_in(m_table, key.c_str());
+	if (raw) {
+		toml_timestamp_t ts;
+		ok = (0 == toml_rtots(raw, &ts));
+		if (ok) {
+			ret.year = (ts.year ? *ts.year : -1);
+			ret.month = (ts.month ? *ts.month : -1);
+			ret.day = (ts.day ? *ts.day : -1);
+			ret.hour = (ts.hour ? *ts.hour : -1);
+			ret.second = (ts.second ? *ts.second : -1);
+			ret.millisec = (ts.millisec ? *ts.millisec : -1);
+			ret.z = ts.z ? string(ts.z) : "";
+		}
+	}
+	return {ok, ret};
+}
+
 
 std::unique_ptr<Value> Table::getValue(const string& key) const
 {
@@ -131,9 +204,9 @@ std::unique_ptr<Table> Table::getTable(const string& key) const
 	return ret;
 }
 
-std::vector<string> Table::keys() const
+vector<string> Table::keys() const
 {
-	std::vector<string> vec;
+	vector<string> vec;
 	for (int i = 0; ; i++) {
 		const char* k = toml_key_in(m_table, i);
 		if (!k) break;
@@ -183,6 +256,123 @@ std::unique_ptr<Table> Array::getTable(int idx) const
 	return ret;
 }
 
+std::unique_ptr< vector<string> > Array::getStringVector() const
+{
+	int top = toml_array_nelem(m_array);
+	if (top < 0) return 0;
+	
+	auto ret = std::make_unique< vector<string> >(top);
+	for (int i = 0; i < top; i++) {
+		toml_raw_t r = toml_raw_at(m_array, i);
+		if (!r) return 0;
+
+		char* s;
+		if (toml_rtos(r, &s)) return 0;
+
+		string v(s);
+		free(s);
+
+		ret->push_back(v);
+	}
+
+	return ret;
+}
+
+
+std::unique_ptr< vector<bool> > Array::getBoolVector() const
+{
+	int top = toml_array_nelem(m_array);
+	if (top < 0) return 0;
+	
+	auto ret = std::make_unique< vector<bool> >(top);
+	for (int i = 0; i < top; i++) {
+		toml_raw_t r = toml_raw_at(m_array, i);
+		if (!r) return 0;
+
+		int v;
+		if (toml_rtob(r, &v)) return 0;
+
+		ret->push_back(!!v);
+	}
+
+	return ret;
+}
+
+
+std::unique_ptr< vector<int64_t> > Array::getIntVector() const
+{
+	int top = toml_array_nelem(m_array);
+	if (top < 0) return 0;
+	
+	auto ret = std::make_unique< vector<int64_t> >(top);
+	for (int i = 0; i < top; i++) {
+		toml_raw_t r = toml_raw_at(m_array, i);
+		if (!r) return 0;
+
+		int64_t v;
+		if (toml_rtoi(r, &v)) return 0;
+
+		ret->push_back(v);
+	}
+
+	return ret;
+}
+
+
+std::unique_ptr< vector<Timestamp> > Array::getTimestampVector() const
+{
+	int top = toml_array_nelem(m_array);
+	if (top < 0) return 0;
+	
+	auto ret = std::make_unique< vector<Timestamp> >(top);
+	for (int i = 0; i < top; i++) {
+		toml_raw_t r = toml_raw_at(m_array, i);
+		if (!r) return 0;
+
+		toml_timestamp_t ts;
+		if (toml_rtots(r, &ts)) return 0;
+
+		Timestamp v;
+		v.year = (ts.year ? *ts.year : -1);
+		v.month = (ts.month ? *ts.month : -1);
+		v.day = (ts.day ? *ts.day : -1);
+		v.hour = (ts.hour ? *ts.hour : -1);
+		v.second = (ts.second ? *ts.second : -1);
+		v.millisec = (ts.millisec ? *ts.millisec : -1);
+		v.z = ts.z ? string(ts.z) : "";
+
+		ret->push_back(v);
+	}
+
+	return ret;
+}
+
+
+std::unique_ptr< vector<double> > Array::getDoubleVector() const
+{
+	int top = toml_array_nelem(m_array);
+	if (top < 0) return 0;
+	
+	auto ret = std::make_unique< vector<double> >(top);
+	for (int i = 0; i < top; i++) {
+		toml_raw_t r = toml_raw_at(m_array, i);
+		if (!r) return 0;
+
+		double v;
+		if (toml_rtod(r, &v)) return 0;
+
+		ret->push_back(v);
+	}
+
+	return ret;
+}
+
+
+int toml::Array::getSize() const
+{
+	return toml_array_nelem(m_array);
+}
+	
 
 toml::ParserResult toml::parse(const string& conf)
 {

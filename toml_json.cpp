@@ -42,6 +42,7 @@
 using std::cout;
 using std::cerr;
 using std::string;
+using std::pair;
 
 static void print_escape_string(const string& str)
 {
@@ -74,85 +75,108 @@ static string z2(int i)
 	return buf;
 }
 
+static void print(const string& s)
+{
+	cout << "{\"type\":\"string\",\"value\":\"";
+	print_escape_string(s);
+	cout << "\"}";
+	return;
+}
+
+static void print(bool b)
+{
+	cout << "{\"type\":\"bool\",\"value\":\"" << b << "\"}";
+}
+
+static void print(int64_t i)
+{
+	cout << "{\"type\":\"integer\",\"value\":\"" << i << "\"}";
+}
+
+static void print(double d)
+{
+	cout << "{\"type\":\"float\",\"value\":\"" << d << "\"}";
+}
+
+static void print(const toml::Timestamp& t)
+{
+	if (t.year != -1 && t.hour != -1) {
+		cout << "{\"type\":\"datetime\",\"value\":\"";
+		cout << z4(t.year);
+		cout << "-" << z2(t.month);
+		cout << "-" << z2(t.day);
+		cout << "T" << z2(t.hour);
+		cout << ":" << z2(t.minute);
+		cout << ":" << z2(t.second);
+		if (t.millisec != -1) 
+			cout << "." << t.millisec;
+		cout << t.z << "\"}";
+		return;
+	}
+	
+	if (t.year != -1) {
+		cout << "{\"type\":\"date\",\"value\":\"";
+		cout << z4(t.year);
+		cout << "-" << z2(t.month);
+		cout << "-" << z2(t.day);
+		cout << "\"}";
+		return;
+	}
+	
+	if (t.hour != -1) {
+		cout << "{\"type\":\"time\",\"value\":\"";
+		cout << z2(t.hour);
+		cout << ":" << z2(t.minute);
+		cout << ":" << z2(t.second);
+		if (t.millisec != -1) 
+			cout << "." << t.millisec;
+		cout << "\"}";
+		return;
+	}
+}
+
+static bool print(pair<bool, string> v)
+{
+	if (!v.first) return 0;
+	print(v.second);
+	return true;
+}
+
+static bool print(pair<bool, bool> v)
+{
+	if (!v.first) return 0;
+	print(v.second);
+	return true;
+}
+
+static bool print(pair<bool, int64_t> v)
+{
+	if (!v.first) return 0;
+	print(v.second);
+	return true;
+}
+
+static bool print(pair<bool, double> v)
+{
+	if (!v.first) return 0;
+	print(v.second);
+	return true;
+}
+
+static bool print(pair<bool, toml::Timestamp> v)
+{
+	if (!v.first) return 0;
+	print(v.second);
+	return true;
+}
 
 static void print(const toml::Value& v)
 {
-	{
-		auto s = v.toString();
-		if (s.first) {
-			cout << "{\"type\":\"string\",\"value\":\"";
-			print_escape_string(s.second);
-			cout << "\"}";
-			return;
-		}
-	}
-
-	{
-		auto i = v.toInt();
-		if (i.first) {
-			cout << "{\"type\":\"integer\",\"value\":\"";
-			cout << i.second;
-			cout << "\"}";
-			return;
-		}
-	}
-
-	{
-		auto b = v.toBool();
-		if (b.first) {
-			cout << "{\"type\":\"bool\",\"value\":\"" << b.second << "\"}";
-			return;
-		}
-	}
-
-	{
-		auto d = v.toDouble();
-		if (d.first) {
-			cout << "{\"type\":\"float\",\"value\":\"" << d.second << "\"}";
-			return;
-		}
-	}
-
-	{
-		auto ts = v.toTimestamp();
-		if (ts.first) {
-			auto& t = ts.second;
-			if (t.year != -1 && t.hour != -1) {
-				cout << "{\"type\":\"datetime\",\"value\":\"";
-				cout << z4(t.year);
-				cout << "-" << z2(t.month);
-				cout << "-" << z2(t.day);
-				cout << "T" << z2(t.hour);
-				cout << ":" << z2(t.minute);
-				cout << ":" << z2(t.second);
-				if (t.millisec != -1) 
-					cout << "." << t.millisec;
-				cout << t.z << "\"}";
-				return;
-			}
-
-			if (t.year != -1) {
-				cout << "{\"type\":\"date\",\"value\":\"";
-				cout << z4(t.year);
-				cout << "-" << z2(t.month);
-				cout << "-" << z2(t.day);
-				cout << "\"}";
-				return;
-			}
-
-			if (t.hour != -1) {
-				cout << "{\"type\":\"time\",\"value\":\"";
-				cout << z2(t.hour);
-				cout << ":" << z2(t.minute);
-				cout << ":" << z2(t.second);
-				if (t.millisec != -1) 
-					cout << "." << t.millisec;
-				cout << "\"}";
-				return;
-			}
-		}
-	}
-
+	if (print(v.toString())) return;
+	if (print(v.toInt())) return;
+	if (print(v.toBool())) return;
+	if (print(v.toDouble())) return;
+	if (print(v.toTimestamp())) return;
 	cerr << "unknown type\n";
 	exit(1);
 }
@@ -171,11 +195,13 @@ static void print(const toml::Table& curtab)
 		print_escape_string(key);
 		cout << "\":";
 		
+		/*
 		auto v = curtab.getValue(key);
 		if (v) {
 			print(*v);
 			continue;
 		}
+		*/
 
 		auto a = curtab.getArray(key);
 		if (a) {
@@ -188,6 +214,21 @@ static void print(const toml::Table& curtab)
 			print(*t);
 			continue;
 		}
+
+		if (print(curtab.getString(key)))
+			continue;
+
+		if (print(curtab.getInt(key)))
+			continue;
+
+		if (print(curtab.getBool(key)))
+			continue;
+
+		if (print(curtab.getDouble(key)))
+			continue;
+
+		if (print(curtab.getTimestamp(key)))
+			continue;
 		
 		abort();
 	}
@@ -208,8 +249,92 @@ static void print(const toml::Array& curarr)
 		cout << "]";
 		return;
 	}
+
+
+	if (curarr.kind() == 'a') {
+		cout << "{\"type\":\"array\",\"value\":[";
+		for (int i = 0; ; i++) {
+			auto a = curarr.getArray(i);
+			if (!a) break;
+			if (i) cout << ",";
+			print(*a);
+		}
+		cout << "]}";
+		return;
+	}
+
+	{
+		auto v = curarr.getStringVector();
+		if (v) {
+			bool first = 1;
+			for (auto& s : *v) {
+				cout << (first ? "" : ",");
+				print(s);
+				first = 0;
+			}
+			return;
+		}
+	}
+
+	{
+		auto v = curarr.getIntVector();
+		if (v) {
+			bool first = 1;
+			for (auto& s : *v) {
+				cout << (first ? "" : ",");
+				print(s);
+				first = 0;
+			}
+			return;
+		}
+	}
+
+	{
+		auto v = curarr.getBoolVector();
+		if (v) {
+			int top = v->size();
+			for (int i = 0; i < top; i++) {
+				cout << (i == 0 ? "" : ",");
+				print((*v)[i]);
+			}
+			return;
+		}
+	}
+
+		
+	{
+		auto v = curarr.getDoubleVector();
+		if (v) {
+			bool first = 1;
+			for (auto& s : *v) {
+				cout << (first ? "" : ",");
+				print(s);
+				first = 0;
+			}
+			return;
+		}
+	}
+
+	{
+		auto v = curarr.getTimestampVector();
+		if (v) {
+			bool first = 1;
+			for (auto& s : *v) {
+				cout << (first ? "" : ",");
+				print(s);
+				first = 0;
+			}
+			return;
+		}
+	}
+
+		
+
 	
-	cout << "{\"type\":\"array\",\"value\":[";
+
+				
+
+	
 	switch (curarr.kind()) {
 
 	case 'v':
@@ -222,12 +347,6 @@ static void print(const toml::Array& curarr)
 		break;
 
 	case 'a': 
-		for (int i = 0; ; i++) {
-			auto a = curarr.getArray(i);
-			if (!a) break;
-			if (i) cout << ",";
-			print(*a);
-		}
 		break;
 
 	default:
