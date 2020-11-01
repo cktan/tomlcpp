@@ -29,6 +29,7 @@
 #include "tomlcpp.hpp"
 #include "toml.h"
 #include <string.h>
+#include <fstream>
 
 using namespace toml;
 using std::string;
@@ -203,3 +204,17 @@ toml::ParserResult toml::parse(const string& conf)
 	}
 	return ret;
 }
+
+
+toml::ParserResult toml::parseFile(const string& path)
+{
+	toml::ParserResult ret;
+	std::ifstream stream(path);
+	if (!stream) {
+		ret.errmsg = strerror(errno);
+		return ret;
+	}
+	std::string conf(std::istreambuf_iterator<char>{stream}, {});
+	return toml::parse(conf);
+}
+
