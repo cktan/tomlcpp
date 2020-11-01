@@ -164,13 +164,13 @@ static void print(const toml::Table& curtab)
 	bool first = true;
 	cout << "{";
 	for (auto& key : curtab.keys()) {
-		const char* sep = first ? "" : ",";
+		cout << (first ? "" : ",");
 		first = false;
-
-		cout << sep << "\"";
+		
+		cout << "\"";
 		print_escape_string(key);
 		cout << "\":";
-
+		
 		auto v = curtab.getValue(key);
 		if (v) {
 			print(*v);
