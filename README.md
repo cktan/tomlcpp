@@ -1,5 +1,5 @@
 # tomlcpp
-TOML CPP Library
+TOML C++ Library
 
 This is a C++ wrapper around the C library available here: https://github.com/cktan/tomlc99.
 
