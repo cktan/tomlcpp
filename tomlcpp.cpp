@@ -54,7 +54,7 @@ struct toml::Backing {
 pair<bool, string> Table::getString(const string& key) const
 {
 	string str;
-	toml_access_t p = toml_string_in(m_table, key.c_str());
+	toml_datum_t p = toml_string_in(m_table, key.c_str());
 	if (p.ok) {
 		str = p.u.s;
 		free(p.u.s);
@@ -64,27 +64,27 @@ pair<bool, string> Table::getString(const string& key) const
 
 pair<bool, bool> Table::getBool(const string& key) const
 {
-	toml_access_t p = toml_bool_in(m_table, key.c_str());
+	toml_datum_t p = toml_bool_in(m_table, key.c_str());
 	return {p.ok, !!p.u.b};
 	
 }
 
 pair<bool, int64_t> Table::getInt(const string& key) const
 {
-	toml_access_t p = toml_int_in(m_table, key.c_str());
+	toml_datum_t p = toml_int_in(m_table, key.c_str());
 	return {p.ok, p.u.i};
 }
 
 pair<bool, double> Table::getDouble(const string& key) const
 {
-	toml_access_t p = toml_double_in(m_table, key.c_str());
+	toml_datum_t p = toml_double_in(m_table, key.c_str());
 	return {p.ok, p.u.d};
 }
 
 pair<bool, Timestamp> Table::getTimestamp(const string& key) const
 {
 	Timestamp ret;
-	toml_access_t p = toml_timestamp_in(m_table, key.c_str());
+	toml_datum_t p = toml_timestamp_in(m_table, key.c_str());
 	if (p.ok) {
 		toml_timestamp_t& ts = p.u.ts;
 		ret.year = (ts.year ? *ts.year : -1);
@@ -169,7 +169,7 @@ std::unique_ptr< vector<string> > Array::getStringVector() const
 	
 	auto ret = std::make_unique< vector<string> >(top);
 	for (int i = 0; i < top; i++) {
-		toml_access_t p = toml_string_at(m_array, i);
+		toml_datum_t p = toml_string_at(m_array, i);
 		if (!p.ok) return 0;
 		ret->push_back(p.u.s);
 		free(p.u.s);
@@ -186,7 +186,7 @@ std::unique_ptr< vector<bool> > Array::getBoolVector() const
 	
 	auto ret = std::make_unique< vector<bool> >(top);
 	for (int i = 0; i < top; i++) {
-		toml_access_t p = toml_bool_at(m_array, i);
+		toml_datum_t p = toml_bool_at(m_array, i);
 		if (!p.ok) return 0;
 		ret->push_back(!!p.u.b);
 	}
@@ -202,7 +202,7 @@ std::unique_ptr< vector<int64_t> > Array::getIntVector() const
 	
 	auto ret = std::make_unique< vector<int64_t> >(top);
 	for (int i = 0; i < top; i++) {
-		toml_access_t p = toml_int_at(m_array, i);
+		toml_datum_t p = toml_int_at(m_array, i);
 		if (!p.ok) return 0;
 		ret->push_back(p.u.i);
 	}
@@ -218,7 +218,7 @@ std::unique_ptr< vector<Timestamp> > Array::getTimestampVector() const
 	
 	auto ret = std::make_unique< vector<Timestamp> >(top);
 	for (int i = 0; i < top; i++) {
-		toml_access_t p = toml_timestamp_at(m_array, i);
+		toml_datum_t p = toml_timestamp_at(m_array, i);
 		if (!p.ok) return 0;
 
 		toml_timestamp_t& ts = p.u.ts;
@@ -245,7 +245,7 @@ std::unique_ptr< vector<double> > Array::getDoubleVector() const
 	
 	auto ret = std::make_unique< vector<double> >(top);
 	for (int i = 0; i < top; i++) {
-		toml_access_t p = toml_double_at(m_array, i);
+		toml_datum_t p = toml_double_at(m_array, i);
 		if (!p.ok) return 0;
 		ret->push_back(p.u.d);
 	}
