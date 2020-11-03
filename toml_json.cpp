@@ -258,7 +258,7 @@ static void print(const toml::Array& curarr)
 		auto v = curarr.getStringVector();
 		if (v) {
 			bool first = 1;
-			for (auto& s : *v) {
+			for (const auto& s : *v) {
 				cout << (first ? "" : ",");
 				print(s);
 				first = 0;
@@ -272,7 +272,7 @@ static void print(const toml::Array& curarr)
 		auto v = curarr.getIntVector();
 		if (v) {
 			bool first = 1;
-			for (auto& s : *v) {
+			for (auto s : *v) {
 				cout << (first ? "" : ",");
 				print(s);
 				first = 0;
@@ -285,10 +285,11 @@ static void print(const toml::Array& curarr)
 	{
 		auto v = curarr.getBoolVector();
 		if (v) {
-			int top = v->size();
-			for (int i = 0; i < top; i++) {
-				cout << (i == 0 ? "" : ",");
-				print((*v)[i]);
+			bool first = 1;
+			for (const auto&& s : *v) {
+				cout << (first ? "" : ",");
+				print(s);
+				first = 0;
 			}
 			cout << "]}";
 			return;
@@ -300,7 +301,7 @@ static void print(const toml::Array& curarr)
 		auto v = curarr.getDoubleVector();
 		if (v) {
 			bool first = 1;
-			for (auto& s : *v) {
+			for (auto s : *v) {
 				cout << (first ? "" : ",");
 				print(s);
 				first = 0;
@@ -314,7 +315,7 @@ static void print(const toml::Array& curarr)
 		auto v = curarr.getTimestampVector();
 		if (v) {
 			bool first = 1;
-			for (auto& s : *v) {
+			for (const auto& s : *v) {
 				cout << (first ? "" : ",");
 				print(s);
 				first = 0;
