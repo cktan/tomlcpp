@@ -86,7 +86,7 @@ pair<bool, Timestamp> Table::getTimestamp(const string& key) const
 	Timestamp ret;
 	toml_datum_t p = toml_timestamp_in(m_table, key.c_str());
 	if (p.ok) {
-		toml_timestamp_t& ts = p.u.ts;
+		toml_timestamp_t& ts = *p.u.ts;
 		ret.year = (ts.year ? *ts.year : -1);
 		ret.month = (ts.month ? *ts.month : -1);
 		ret.day = (ts.day ? *ts.day : -1);
@@ -94,6 +94,7 @@ pair<bool, Timestamp> Table::getTimestamp(const string& key) const
 		ret.second = (ts.second ? *ts.second : -1);
 		ret.millisec = (ts.millisec ? *ts.millisec : -1);
 		ret.z = ts.z ? string(ts.z) : "";
+		free(p.u.ts);
 	}
 	return {p.ok, ret};
 }
@@ -221,7 +222,7 @@ std::unique_ptr< vector<Timestamp> > Array::getTimestampVector() const
 		toml_datum_t p = toml_timestamp_at(m_array, i);
 		if (!p.ok) return 0;
 
-		toml_timestamp_t& ts = p.u.ts;
+		toml_timestamp_t& ts = *p.u.ts;
 		Timestamp v;
 		v.year = (ts.year ? *ts.year : -1);
 		v.month = (ts.month ? *ts.month : -1);
@@ -230,7 +231,8 @@ std::unique_ptr< vector<Timestamp> > Array::getTimestampVector() const
 		v.second = (ts.second ? *ts.second : -1);
 		v.millisec = (ts.millisec ? *ts.millisec : -1);
 		v.z = ts.z ? string(ts.z) : "";
-
+		free(p.u.ts);
+		
 		ret->push_back(v);
 	}
 
