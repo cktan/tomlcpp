@@ -15,15 +15,14 @@ Here is a simple example that parses this config file:
 
 Steps for getting values:
 
-1. Read the file into a string
-2. Call toml::parse on the string
-3. Get the top-level table
-4. Get values from the top-level table
-5. Examine the values
+1. Call toml::parseFile on a toml file
+2. Get the top-level table
+3. Get values from the top-level table
+4. Examine the values
 
 ```
-// parse a string containing toml data
-auto result = toml::parse(str);
+// parse a file containing toml data
+auto result = toml::parseFile("sample.toml");
 if (!result.table) {
     handle_error(result.errmsg);
 }
