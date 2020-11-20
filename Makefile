@@ -2,7 +2,7 @@ HFILES = toml.h tomlcpp.hpp
 CFILES = toml.c
 CPPFILES = tomlcpp.cpp
 OBJ = $(CFILES:.c=.o)  $(CPPFILES:.cpp=.o)
-EXEC = toml_json
+EXEC = toml_json toml_sample
 
 CFLAGS = -Wall -Wextra -fpic
 LIB = libtomlcpp.a
@@ -30,6 +30,8 @@ libtomlcpp.so: $(OBJ)
 	$(CC) -shared -o $@ $^
 
 toml_json: toml_json.cpp $(LIB)
+
+toml_sample: toml_sample.cpp $(LIB)
 
 prefix ?= /usr/local
 

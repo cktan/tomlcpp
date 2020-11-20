@@ -168,7 +168,8 @@ std::unique_ptr< vector<string> > Array::getStringVector() const
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
 	
-	auto ret = std::make_unique< vector<string> >(top);
+	auto ret = std::make_unique< vector<string> >();
+	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
 		toml_datum_t p = toml_string_at(m_array, i);
 		if (!p.ok) return 0;
@@ -185,7 +186,8 @@ std::unique_ptr< vector<bool> > Array::getBoolVector() const
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
 	
-	auto ret = std::make_unique< vector<bool> >(top);
+	auto ret = std::make_unique< vector<bool> >();
+	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
 		toml_datum_t p = toml_bool_at(m_array, i);
 		if (!p.ok) return 0;
@@ -201,7 +203,8 @@ std::unique_ptr< vector<int64_t> > Array::getIntVector() const
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
 	
-	auto ret = std::make_unique< vector<int64_t> >(top);
+	auto ret = std::make_unique< vector<int64_t> >();
+	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
 		toml_datum_t p = toml_int_at(m_array, i);
 		if (!p.ok) return 0;
@@ -217,7 +220,8 @@ std::unique_ptr< vector<Timestamp> > Array::getTimestampVector() const
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
 	
-	auto ret = std::make_unique< vector<Timestamp> >(top);
+	auto ret = std::make_unique< vector<Timestamp> >();
+	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
 		toml_datum_t p = toml_timestamp_at(m_array, i);
 		if (!p.ok) return 0;
@@ -245,7 +249,8 @@ std::unique_ptr< vector<double> > Array::getDoubleVector() const
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
 	
-	auto ret = std::make_unique< vector<double> >(top);
+	auto ret = std::make_unique< vector<double> >();
+	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
 		toml_datum_t p = toml_double_at(m_array, i);
 		if (!p.ok) return 0;

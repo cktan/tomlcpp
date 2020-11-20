@@ -1,0 +1,4 @@
+[server]
+    host = "example.com"
+    port = 80
+    moreport = [1,2,3,4]
