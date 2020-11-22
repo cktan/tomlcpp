@@ -10,7 +10,7 @@ using std::cout;
 
 std::shared_ptr<toml::Table> load()
 {
-	toml::ParserResult res = toml::parseFile("sample.toml");
+	toml::Result res = toml::parseFile("sample.toml");
 	if (!res.table) {
 		cerr << "ERROR: " << res.errmsg << "\n";
 		exit(1);

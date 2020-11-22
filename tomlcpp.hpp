@@ -117,13 +117,13 @@ namespace toml {
 
 
 	/* The main function: Parse */
-	struct ParserResult {
+	struct Result {
 		std::shared_ptr<Table> table;
 		string errmsg;
 	};
 
-	ParserResult parse(const string& conf);
-	ParserResult parseFile(const string& path);
+	Result parse(const string& conf);
+	Result parseFile(const string& path);
 };
 
 

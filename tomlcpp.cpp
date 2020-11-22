@@ -267,9 +267,9 @@ int toml::Array::size() const
 }
 	
 
-toml::ParserResult toml::parse(const string& conf)
+toml::Result toml::parse(const string& conf)
 {
-	toml::ParserResult ret;
+	toml::Result ret;
 	char errbuf[200];
 	char* s = strdup(conf.c_str());
 	if (!s) {
@@ -289,9 +289,9 @@ toml::ParserResult toml::parse(const string& conf)
 }
 
 
-toml::ParserResult toml::parseFile(const string& path)
+toml::Result toml::parseFile(const string& path)
 {
-	toml::ParserResult ret;
+	toml::Result ret;
 	std::ifstream stream(path);
 	if (!stream) {
 		ret.errmsg = strerror(errno);
