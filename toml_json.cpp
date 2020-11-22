@@ -179,19 +179,14 @@ static void print(const toml::Table& curtab)
 	for (auto& key : curtab.keys()) {
 		cout << (first ? "" : ",");
 		first = false;
-		
+
+		// print the key
 		cout << "\"";
 		print_escape_string(key);
 		cout << "\":";
-		
-		/*
-		auto v = curtab.getValue(key);
-		if (v) {
-			print(*v);
-			continue;
-		}
-		*/
 
+		// print the associated value
+		
 		auto a = curtab.getArray(key);
 		if (a) {
 			print(*a);
@@ -225,12 +220,12 @@ static void print(const toml::Table& curtab)
 }
 
 
-static void print(const toml::Array& curarr)
+static void print(const toml::Array& arr)
 {
-	if (curarr.kind() == 't') {
+	if (arr.kind() == 't') {
 		cout << "[";
 		for (int i = 0; ; i++) {
-			auto tab = curarr.getTable(i);
+			auto tab = arr.getTable(i);
 			if (!tab) break;
 			if (i) cout << ",";
 			print(*tab);
@@ -240,10 +235,10 @@ static void print(const toml::Array& curarr)
 	}
 
 
-	if (curarr.kind() == 'a') {
+	if (arr.kind() == 'a') {
 		cout << "{\"type\":\"array\",\"value\":[";
 		for (int i = 0; ; i++) {
-			auto a = curarr.getArray(i);
+			auto a = arr.getArray(i);
 			if (!a) break;
 			if (i) cout << ",";
 			print(*a);
@@ -255,7 +250,7 @@ static void print(const toml::Array& curarr)
 	
 	cout << "{\"type\":\"array\",\"value\":[";
 	{
-		auto v = curarr.getStringVector();
+		auto v = arr.getStringVector();
 		if (v) {
 			bool first = 1;
 			for (const auto& s : *v) {
@@ -269,7 +264,7 @@ static void print(const toml::Array& curarr)
 	}
 
 	{
-		auto v = curarr.getIntVector();
+		auto v = arr.getIntVector();
 		if (v) {
 			bool first = 1;
 			for (auto s : *v) {
@@ -283,7 +278,7 @@ static void print(const toml::Array& curarr)
 	}
 
 	{
-		auto v = curarr.getBoolVector();
+		auto v = arr.getBoolVector();
 		if (v) {
 			bool first = 1;
 			for (const auto&& s : *v) {
@@ -298,7 +293,7 @@ static void print(const toml::Array& curarr)
 
 		
 	{
-		auto v = curarr.getDoubleVector();
+		auto v = arr.getDoubleVector();
 		if (v) {
 			bool first = 1;
 			for (auto s : *v) {
@@ -312,7 +307,7 @@ static void print(const toml::Array& curarr)
 	}
 
 	{
-		auto v = curarr.getTimestampVector();
+		auto v = arr.getTimestampVector();
 		if (v) {
 			bool first = 1;
 			for (const auto& s : *v) {
