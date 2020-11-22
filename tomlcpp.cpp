@@ -41,8 +41,8 @@ using std::pair;
  *  to the tree returned by toml::parse is no longer reachable.
  */
 struct toml::Backing {
-	char* ptr;
-	toml_table_t* root;
+	char* ptr = 0;
+	toml_table_t* root = 0;
 	Backing(char* p) : ptr(p) {}
 	~Backing() {
 		free(ptr);
