@@ -66,14 +66,14 @@ The method `Table::keys()` returns a vector of keys.
 
 #### Content
 
-To extract value by keys, call the `toml::getXXXX(key)` methods and supply the key:
+To extract value by keys, call the `Table::getXXXX(key)` methods and supply the key:
 
 ```
-toml::getString(key)
-toml::getBool(key)
-toml::getInt(key)
-toml::getDouble(key)
-toml::getTimestamp(key)
+Table::getString(key)
+Table::getBool(key)
+Table::getInt(key)
+Table::getDouble(key)
+Table::getTimestamp(key)
 ```
 
 These methods return a C++ `pair`, in which `pair.first` is a success indicator, and `pair.second` is the result value.
@@ -81,8 +81,8 @@ These methods return a C++ `pair`, in which `pair.first` is a success indicator,
 To access table or array by keys, use these methods which return a `unique_ptr` to an Array or Table:
 
 ```
-toml::getTable(key)
-toml::getArray(key)
+Table::getTable(key)
+Table::getArray(key)
 ```
 
 ## Traversing Array
@@ -90,13 +90,13 @@ toml::getArray(key)
 To extract the primitive content of a toml::Array, call one of these methods:
 
 ```
-toml::getStringVector()
-toml::getBoolVector()
-toml::getIntVector()
-toml::getDoubleVector()
-toml::getTimestampVector()
-toml::getArrayVector()
-toml::getTableVector()
+Array::getStringVector()
+Array::getBoolVector()
+Array::getIntVector()
+Array::getDoubleVector()
+Array::getTimestampVector()
+Array::getArrayVector()
+Array::getTableVector()
 ```
 
 These methods return `unique_ptr` to a C++ vector.
