@@ -66,7 +66,7 @@ The method `Table::keys()` returns a vector of keys.
 
 #### Content
 
-To extract value by keys, call the `Table::getXXXX(key)` methods and supply the key:
+To extract values in a Table, call the `Table::getXXXX(key)` methods and supply the key:
 
 ```
 Table::getString(key)
@@ -78,7 +78,7 @@ Table::getTimestamp(key)
 
 These methods return a C++ `pair`, in which `pair.first` is a success indicator, and `pair.second` is the result value.
 
-To access table or array by keys, use these methods which return a `unique_ptr` to an Array or Table:
+To access table or array in a Table, use these methods which return a `unique_ptr` to an Array or Table:
 
 ```
 Table::getTable(key)
