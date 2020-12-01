@@ -49,12 +49,12 @@ auto port = server->getInt("port");
 if (!port.first) {
    handle_error("missing or bad port entry");
 }
-auto peers = server->getArray("peers");
-if (!peers) {
+auto peersArray = server->getArray("peers");
+if (!peersArray) {
     handle_error("missing or bad peers entry");
 }
-auto pv = peers->getStringVector();
-if (!pv) {
+auto peers = peers->getStringVector();
+if (!peers) {
     handle_error("bad peers entry");
 }
 
@@ -62,7 +62,7 @@ if (!pv) {
 cout << "server.host is " << host.second << "\n";
 cout << "server.port is " << port.second << "\n";
 cout << "server.peers is [";
-for (auto& p : *pv) {
+for (auto& p : *peers) {
     cout << p << " ";
 }
 cout << "]\n";
