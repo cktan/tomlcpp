@@ -68,14 +68,14 @@ for (auto& p : *pv) {
 cout << "]\n";
 ```
 
-## Parsing
+### Parsing
 
 To parse a toml text or file, simply call `toml::parse(text)` or `toml::parseFile(path)`. 
 The return value is a `Result` struct. On success, the `Result.table` will have a non-NULL 
 pointer to the toml table content. On failure, the `Result.table` will be NULL, and `Result.errmsg` 
 stores a string describing the error.
 
-## Traversing Table
+### Traversing Table
 
 Toml tables are key-value maps. 
 
@@ -104,7 +104,7 @@ Table::getTable(key)
 Table::getArray(key)
 ```
 
-## Traversing Array
+### Traversing Array
 
 To extract the primitive content of a toml::Array, call one of these methods:
 
@@ -120,4 +120,13 @@ Array::getTableVector()
 
 These methods return `unique_ptr` to a C++ `vector`.
 
+## Building and installing
 
+A normal *make* suffices. You can also simply include the
+`toml.c`, `toml.h`, `tomlcpp.cpp`, `tomlcpp.hpp` files in your project.
+
+Invoking `make install` will install the header file in
+/usr/local/include and library files in /usr/local/lib.
+
+Alternatively, specify `make install prefix=/a/file/path` to install into
+/a/file/path/include and /a/file/path/lib/.
