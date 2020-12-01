@@ -66,7 +66,7 @@ The method `Table::keys()` returns a vector of keys.
 
 #### Content
 
-To extract value by keys, call the `Toml::getXXXX(key)` methods and supply the key:
+To extract value by keys, call the `toml::getXXXX(key)` methods and supply the key:
 
 ```
 toml::getString(key)
@@ -78,14 +78,25 @@ toml::getTimestamp(key)
 
 These methods return a C++ `pair`, in which `pair.first` is a success indicator, and `pair.second` is the result value.
 
-To extract table or array by keys, use these methods which return a `unique_ptr` to an Array or Table:
+To access table or array by keys, use these methods which return a `unique_ptr` to an Array or Table:
 
 ```
 toml::getTable(key)
 toml::getArray(key)
 ```
 
+## Traversing Array
 
+To extract the primitive content of a toml::Array, call one of these methods:
 
+```
+toml::getStringVector()
+toml::getBoolVector()
+toml::getIntVector()
+toml::getDoubleVector()
+toml::getTimestampVector()
+```
+
+These methods return `unique_ptr` to a C++ vector.
 
 
