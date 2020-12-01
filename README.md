@@ -47,5 +47,45 @@ if (!port.first) {
 cout << "server.host is " << host.second << "\n";
 cout << "server.port is " << port.second << "\n";
 
+```
+
+## Parsing
+
+To parse a toml text or file, simply call `toml::parse(text)` or `toml::parseFile(path)`. 
+The return value is a `Result` struct. On success, the `Result.table` will have a non-NULL 
+pointer to the toml table content. On failure, the `Result.table` will be NULL, and `Result.errmsg` 
+stores a string describing the error.
+
+## Traversing Table
+
+Toml tables are key-value maps. 
+
+### Keys
+
+The method `Table::keys()` returns a vector of keys.
+
+## Content
+
+To extract value by keys, call the `Toml::getXXXX(key)` methods and supply the key:
 
 ```
+toml::getString(key)
+toml::getBool(key)
+toml::getInt(key)
+toml::getDouble(key)
+toml::getTimestamp(key)
+```
+
+These methods return a C++ `pair`, in which `pair.first` is a success indicator, and `pair.second` is the result value.
+
+To extract table or array by keys, use these methods which return a `unique_ptr` to an Array or Table:
+
+```
+toml::getTable(key)
+toml::getArray(key)
+```
+
+
+
+
+
