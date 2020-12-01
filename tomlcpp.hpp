@@ -72,8 +72,6 @@ namespace toml {
 		std::shared_ptr<Backing> m_backing;
 		
 		Table() = delete;
-		Table(Table&) = delete;
-		Table& operator=(Table&) = delete;
 	};
 
 
@@ -99,9 +97,9 @@ namespace toml {
 		std::unique_ptr< vector<double> >     getDoubleVector() const;
 		std::unique_ptr< vector<Timestamp> >  getTimestampVector() const;
 
-		// Regular access methods
-		std::unique_ptr<Table> getTable(int idx) const;
-		std::unique_ptr<Array> getArray(int idx) const;
+		// Obtain vectors of table or array
+		std::unique_ptr< vector<Table>> getTableVector() const;
+		std::unique_ptr< vector<Array>> getArrayVector() const;
 
 		// internal
 		Array(toml_array_t* a, std::shared_ptr<Backing> backing) : m_array(a), m_backing(backing) {}
@@ -111,8 +109,6 @@ namespace toml {
 		std::shared_ptr<Backing> m_backing;
 		
 		Array() = delete;
-		Array(Array&) = delete;
-		Array& operator=(Array&) = delete;
 	};
 
 

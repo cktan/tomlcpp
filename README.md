@@ -95,6 +95,8 @@ toml::getBoolVector()
 toml::getIntVector()
 toml::getDoubleVector()
 toml::getTimestampVector()
+toml::getArrayVector()
+toml::getTableVector()
 ```
 
 These methods return `unique_ptr` to a C++ vector.

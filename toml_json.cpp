@@ -223,12 +223,13 @@ static void print(const toml::Table& curtab)
 static void print(const toml::Array& arr)
 {
 	if (arr.kind() == 't') {
+		auto tvec = arr.getTableVector();
 		cout << "[";
-		for (int i = 0; ; i++) {
-			auto tab = arr.getTable(i);
-			if (!tab) break;
+		int i = 0;
+		for (auto& t : *tvec) {
 			if (i) cout << ",";
-			print(*tab);
+			print(t);
+			i++;
 		}
 		cout << "]";
 		return;
@@ -236,12 +237,13 @@ static void print(const toml::Array& arr)
 
 
 	if (arr.kind() == 'a') {
+		auto avec = arr.getArrayVector();
 		cout << "{\"type\":\"array\",\"value\":[";
-		for (int i = 0; ; i++) {
-			auto a = arr.getArray(i);
-			if (!a) break;
+		int i = 0;
+		for (auto& a : *avec) {
 			if (i) cout << ",";
-			print(*a);
+			print(a);
+			i++;
 		}
 		cout << "]}";
 		return;

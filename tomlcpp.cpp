@@ -143,23 +143,40 @@ char Array::type() const
 	return toml_array_type(m_array);
 }
 
-std::unique_ptr<Array> Array::getArray(int idx) const
-{
-	toml_array_t* a = toml_array_at(m_array, idx);
-	if (!a)
-		return 0;
 
-	auto ret = std::make_unique<Array>(a, m_backing);
+std::unique_ptr< vector<Array>> Array::getArrayVector() const
+{
+	int top = toml_array_nelem(m_array);
+	if (top < 0) return 0;
+
+	auto ret = std::make_unique< vector<Array>>();
+	ret->reserve(top);
+	for (int i = 0; i < top; i++) {
+		toml_array_t* a = toml_array_at(m_array, i);
+		if (!a)
+			return 0;
+
+		ret->push_back(Array(a, m_backing));
+	}
+		
 	return ret;
 }
 
-std::unique_ptr<Table> Array::getTable(int idx) const
+std::unique_ptr< vector<Table>> Array::getTableVector() const
 {
-	toml_table_t* t = toml_table_at(m_array, idx);
-	if (!t)
-		return 0;
+	int top = toml_array_nelem(m_array);
+	if (top < 0) return 0;
 
-	auto ret = std::make_unique<Table>(t, m_backing);
+	auto ret = std::make_unique< vector<Table>>();
+	ret->reserve(top);
+	for (int i = 0; i < top; i++) {
+		toml_table_t* t = toml_table_at(m_array, i);
+		if (!t)
+			return 0;
+
+		ret->push_back(Table(t, m_backing));
+	}
+	
 	return ret;
 }
 
