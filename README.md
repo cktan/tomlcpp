@@ -60,11 +60,11 @@ stores a string describing the error.
 
 Toml tables are key-value maps. 
 
-### Keys
+#### Keys
 
 The method `Table::keys()` returns a vector of keys.
 
-## Content
+#### Content
 
 To extract value by keys, call the `Toml::getXXXX(key)` methods and supply the key:
 
