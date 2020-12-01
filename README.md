@@ -5,6 +5,12 @@ This is a C++ wrapper around the C library available here: https://github.com/ck
 
 ## Usage
 
+First, include the necessary header file:
+
+```
+#include "tomlcpp.hpp"
+```
+
 Here is a simple example that parses this config file:
 
 ```
