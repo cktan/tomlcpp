@@ -99,6 +99,6 @@ Array::getArrayVector()
 Array::getTableVector()
 ```
 
-These methods return `unique_ptr` to a C++ vector.
+These methods return `unique_ptr` to a C++ `vector`.
 
 
