@@ -17,6 +17,7 @@ Here is a simple example that parses this config file:
 [server]
 	host = "example.com"
 	port = 80
+	peers = ["alpha", "beta", "gamma"]
 ```
 
 Steps for getting values:
@@ -48,11 +49,23 @@ auto port = server->getInt("port");
 if (!port.first) {
    handle_error("missing or bad port entry");
 }
+auto peers = server->getArray("peers");
+if (!peers) {
+    handle_error("missing or bad peers entry");
+}
+auto pv = peers->getStringVector();
+if (!pv) {
+    handle_error("bad peers entry");
+}
 
 // examine the values
 cout << "server.host is " << host.second << "\n";
 cout << "server.port is " << port.second << "\n";
-
+cout << "server.peers is [";
+for (auto& p : *pv) {
+    cout << p << " ";
+}
+cout << "]\n";
 ```
 
 ## Parsing
