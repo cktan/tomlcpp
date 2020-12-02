@@ -27,20 +27,20 @@ int main()
 		exit(1);
 	}
 
-	auto moreport = server->getArray("moreport");
-	if (!moreport) {
-		cerr << "ERROR: missing \"moreport\" array\n";
+	auto portArray = server->getArray("port");
+	if (!portArray) {
+		cerr << "ERROR: missing \"port\" array\n";
 		exit(1);
 	}
 
-	auto p = moreport->getIntVector();
-	if (!p) {
+	auto port = portArray->getIntVector();
+	if (!port) {
 		cerr << "ERROR: unable to extract int vector from moreport\n";
 		exit(1);
 	}
 
-	for (auto i : *p) {
-		cout << i << "\n";
+	for (auto p : *port) {
+		cout << p << "\n";
 	}
 
 	return 0;
