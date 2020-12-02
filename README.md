@@ -59,12 +59,12 @@ int main()
 	
 	auto portArray = server->getArray("port");
 	if (!portArray) {
-		fatal("missing \"port\" array");
+		fatal("missing 'port' array");
 	}
 
 	auto port = portArray->getIntVector();
 	if (!port) {
-		fatal("unable to extract int vector from \"port\"");
+		fatal("unable to extract int vector from 'port'");
 	}
 
 	// 4. examine the values
