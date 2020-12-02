@@ -5,12 +5,6 @@ This is a C++ wrapper around the C library available here: https://github.com/ck
 
 ## Usage
 
-First, include the necessary header file:
-
-```
-#include "tomlcpp.hpp"
-```
-
 Here is a simple example that parses this config file:
 
 ```
@@ -26,40 +20,63 @@ Steps for getting values:
 3. Get values from the top-level table
 4. Examine the values
 
-```
-// 1. parse a file containing toml data
-auto result = toml::parseFile("sample.toml");
-if (!result.table) {
-    handle_error(result.errmsg);
+```c++
+#include <utility>
+#include <string>
+#include <vector>
+#include <memory>
+#include <iostream>
+#include "tomlcpp.hpp"
+
+using std::cerr;
+using std::cout;
+
+void fatal(std::string msg)
+{
+	cerr << "FATAL: " << msg << "\n";
+	exit(1);
 }
 
-// 2. get the top level table
-auto server = result.table.getTable("server");
-if (!server) {
-    handle_error("missing table [server]");
-}
+int main()
+{
+	// 1. parse file
+	auto res = toml::parseFile("sample.toml");
+	if (!res.table) {
+		fatal("cannot parse file: " + res.errmsg);
+	}
 
-// 3. get values from the table
-auto host = server->getString("host");
-if (!host.first) {
-    handle_error("missing or bad host entry");
-}
-auto portArray = server->getArray("port");
-if (!portArray) {
-   handle_error("missing or bad port entry");
-}
-auto port = portArray->getIntVector();
-if (!port) {
-    handle_error("bad port entry");
-}
+	// 2. get top level table
+	auto server = res.table->getTable("server");
+	if (!server) {
+		fatal("missing [server]");
+	}
 
-// 4. examine the values
-cout << "server.host is " << host.second << "\n";
-cout << "server.port is [";
-for (auto p : *port) {
-    cout << p << " ";
+	// 3. extract values from the top level table
+	auto host = server->getString("host");
+	if (!host.first) {
+		fatal("missing or bad host entry");
+	}
+	
+	auto portArray = server->getArray("port");
+	if (!portArray) {
+		fatal("missing \"port\" array");
+	}
+
+	auto port = portArray->getIntVector();
+	if (!port) {
+		fatal("unable to extract int vector from \"port\"");
+	}
+
+	// 4. examine the values
+	cout << "host: " << host.second << "\n";
+	cout << "port: ";
+	for (auto p : *port) {
+		cout << p << " ";
+	}
+	cout << "\n";
+
+	return 0;
 }
-cout << "]\n";
 ```
 
 ### Parsing

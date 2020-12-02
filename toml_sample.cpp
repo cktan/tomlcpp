@@ -8,40 +8,49 @@
 using std::cerr;
 using std::cout;
 
-std::shared_ptr<toml::Table> load()
+void fatal(std::string msg)
 {
-	toml::Result res = toml::parseFile("sample.toml");
-	if (!res.table) {
-		cerr << "ERROR: " << res.errmsg << "\n";
-		exit(1);
-	}
-	return res.table;
+	cerr << "FATAL: " << msg << "\n";
+	exit(1);
 }
 
 int main()
 {
-	auto table = load();
-	auto server = table->getTable("server");
-	if (!server) {
-		cerr << "ERROR: missing [server]\n";
-		exit(1);
+	// 1. parse file
+	auto res = toml::parseFile("sample.toml");
+	if (!res.table) {
+		fatal("cannot parse file: " + res.errmsg);
 	}
 
+	// 2. get top level table
+	auto server = res.table->getTable("server");
+	if (!server) {
+		fatal("missing [server]");
+	}
+
+	// 3. extract values from the top level table
+	auto host = server->getString("host");
+	if (!host.first) {
+		fatal("missing or bad host entry");
+	}
+	
 	auto portArray = server->getArray("port");
 	if (!portArray) {
-		cerr << "ERROR: missing \"port\" array\n";
-		exit(1);
+		fatal("missing \"port\" array");
 	}
 
 	auto port = portArray->getIntVector();
 	if (!port) {
-		cerr << "ERROR: unable to extract int vector from moreport\n";
-		exit(1);
+		fatal("unable to extract int vector from \"port\"");
 	}
 
+	// 4. examine the values
+	cout << "host: " << host.second << "\n";
+	cout << "port: ";
 	for (auto p : *port) {
-		cout << p << "\n";
+		cout << p << " ";
 	}
+	cout << "\n";
 
 	return 0;
 }
