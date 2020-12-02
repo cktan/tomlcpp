@@ -1,5 +1,5 @@
 # tomlcpp
-TOML C++ Library
+TOML in C++; v1.0 compliant.
 
 This is a C++ wrapper around the C library available here: https://github.com/cktan/tomlc99.
 
@@ -27,19 +27,19 @@ Steps for getting values:
 4. Examine the values
 
 ```
-// parse a file containing toml data
+// 1. parse a file containing toml data
 auto result = toml::parseFile("sample.toml");
 if (!result.table) {
     handle_error(result.errmsg);
 }
 
-// get the top level table
+// 2. get the top level table
 auto server = result.table.getTable("server");
 if (!server) {
     handle_error("missing table [server]");
 }
 
-// get value from the table
+// 3. get values from the table
 auto host = server->getString("host");
 if (!host.first) {
     handle_error("missing or bad host entry");
@@ -53,7 +53,7 @@ if (!port) {
     handle_error("bad port entry");
 }
 
-// examine the values
+// 4. examine the values
 cout << "server.host is " << host.second << "\n";
 cout << "server.port is [";
 for (auto& p : *port) {
@@ -64,9 +64,9 @@ cout << "]\n";
 
 ### Parsing
 
-To parse a toml text or file, simply call `toml::parse(text)` or `toml::parseFile(path)`. 
+To parse a toml text or file, invoke `toml::parse(text)` or `toml::parseFile(path)`. 
 The return value is a `Result` struct. On success, the `Result.table` will have a non-NULL 
-pointer to the toml table content. On failure, the `Result.table` will be NULL, and `Result.errmsg` 
+pointer to the toml table content. Otherwise, the `Result.table` will be NULL, and `Result.errmsg` 
 stores a string describing the error.
 
 ### Traversing Table
