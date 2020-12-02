@@ -56,7 +56,7 @@ if (!port) {
 // 4. examine the values
 cout << "server.host is " << host.second << "\n";
 cout << "server.port is [";
-for (auto& p : *port) {
+for (auto p : *port) {
     cout << p << " ";
 }
 cout << "]\n";
