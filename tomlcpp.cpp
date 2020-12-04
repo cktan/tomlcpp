@@ -59,9 +59,12 @@ static void toml_myfree(void* p)
 struct toml::Backing {
 	char* ptr = 0;
 	toml_table_t* root = 0;
-	Backing(char* p) : ptr(p) {}
+	Backing(const string& conf) {
+		ptr = new char[conf.length() + 1];
+		strcpy(ptr, conf.c_str());
+	}
 	~Backing() {
-		free(ptr);
+		if (ptr) delete[] ptr;
 		if (root) toml_free(root);
 	}
 };
@@ -304,15 +307,10 @@ toml::Result toml::parse(const string& conf)
 {
 	toml::Result ret;
 	char errbuf[200];
-	char* s = strdup(conf.c_str());
-	if (!s) {
-		ret.errmsg = "out of memory";
-		return ret;
-	}
-	auto backing = std::make_shared<Backing>(s);
+	auto backing = std::make_shared<Backing>(conf);
 
 	toml_set_memutil(toml_mymalloc, toml_myfree);
-	toml_table_t* t = toml_parse(s, errbuf, sizeof(errbuf));
+	toml_table_t* t = toml_parse(backing->ptr, errbuf, sizeof(errbuf));
 	if (t) {
 		ret.table = std::make_shared<Table>(t, backing);
 		backing->root = t;
