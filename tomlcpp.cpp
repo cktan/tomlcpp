@@ -36,6 +36,22 @@ using std::string;
 using std::vector;
 using std::pair;
 
+
+static void* toml_mymalloc(size_t sz)
+{
+	return new char[sz];
+}
+
+static void toml_myfree(void* p)
+{
+	if (p) {
+		char* pp = (char*) p;
+		delete[] pp;
+	}
+}
+
+
+
 /**
  *  Keep track of memory to be freed when all references
  *  to the tree returned by toml::parse is no longer reachable.
@@ -294,7 +310,8 @@ toml::Result toml::parse(const string& conf)
 		return ret;
 	}
 	auto backing = std::make_shared<Backing>(s);
-	
+
+	toml_set_memutil(toml_mymalloc, toml_myfree);
 	toml_table_t* t = toml_parse(s, errbuf, sizeof(errbuf));
 	if (t) {
 		ret.table = std::make_shared<Table>(t, backing);
