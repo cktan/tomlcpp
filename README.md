@@ -108,7 +108,7 @@ Table::getTimestamp(key)
 
 These methods return a C++ `pair`, in which `pair.first` is a success indicator, and `pair.second` is the result value.
 
-To access table or array in a Table, use these methods which return a `unique_ptr` to an Array or Table:
+To access table or array in a Table, use these methods which return a `unique_ptr` to a Table or Arrat:
 
 ```
 Table::getTable(key)
