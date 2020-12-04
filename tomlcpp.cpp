@@ -73,7 +73,7 @@ pair<bool, string> Table::getString(const string& key) const
 	toml_datum_t p = toml_string_in(m_table, key.c_str());
 	if (p.ok) {
 		str = p.u.s;
-		free(p.u.s);
+		toml_myfree(p.u.s);
 	}
 	return {p.ok, str};
 }
@@ -110,7 +110,7 @@ pair<bool, Timestamp> Table::getTimestamp(const string& key) const
 		ret.second = (ts.second ? *ts.second : -1);
 		ret.millisec = (ts.millisec ? *ts.millisec : -1);
 		ret.z = ts.z ? string(ts.z) : "";
-		free(p.u.ts);
+		toml_myfree(p.u.ts);
 	}
 	return {p.ok, ret};
 }
@@ -207,7 +207,7 @@ std::unique_ptr< vector<string> > Array::getStringVector() const
 		toml_datum_t p = toml_string_at(m_array, i);
 		if (!p.ok) return 0;
 		ret->push_back(p.u.s);
-		free(p.u.s);
+		toml_myfree(p.u.s);
 	}
 	
 	return ret;
@@ -268,7 +268,7 @@ std::unique_ptr< vector<Timestamp> > Array::getTimestampVector() const
 		v.second = (ts.second ? *ts.second : -1);
 		v.millisec = (ts.millisec ? *ts.millisec : -1);
 		v.z = ts.z ? string(ts.z) : "";
-		free(p.u.ts);
+		toml_myfree(p.u.ts);
 		
 		ret->push_back(v);
 	}
