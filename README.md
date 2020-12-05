@@ -7,8 +7,8 @@ This is a C++ wrapper around the C library available here: https://github.com/ck
 * Tested with multiple test suites, including
 [BurntSushi/toml-test](https://github.com/BurntSushi/toml-test) and
 [iarna/toml-spec-tests](https://github.com/iarna/toml-spec-tests).
-* Does not throw C++ exceptions
-* Provides very simple interface
+* Does not throw C++ exceptions.
+* Provides very simple and intuitive interface.
 
 
 ## Usage
