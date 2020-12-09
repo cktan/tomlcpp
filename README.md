@@ -94,7 +94,7 @@ The return value is a `Result` struct. On success, the `Result.table` will have 
 pointer to the toml table content. Otherwise, the `Result.table` will be NULL, and `Result.errmsg` 
 stores a string describing the error.
 
-### Traversing Table
+### Traversing table
 
 Toml tables are key-value maps. 
 
@@ -123,7 +123,7 @@ Table::getTable(key)
 Table::getArray(key)
 ```
 
-### Traversing Array
+### Traversing array
 
 To extract the primitive content of a toml::Array, call one of these methods:
 
