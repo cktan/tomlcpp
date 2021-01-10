@@ -2,19 +2,19 @@
 
   MIT License
 
-  Copyright (c) 2020 CK Tan 
+  Copyright (c) 2020 CK Tan
   https://github.com/cktan/tomlcpp
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,10 +26,10 @@
 */
 #include <memory>
 #include <vector>
-#include "tomlcpp.hpp"
-#include "toml.h"
 #include <string.h>
 #include <fstream>
+#include "tomlcpp.hpp"
+#include "toml.h"
 
 using namespace toml;
 using std::string;
@@ -85,7 +85,7 @@ pair<bool, bool> Table::getBool(const string& key) const
 {
 	toml_datum_t p = toml_bool_in(m_table, key.c_str());
 	return {p.ok, !!p.u.b};
-	
+
 }
 
 pair<bool, int64_t> Table::getInt(const string& key) const
@@ -177,7 +177,7 @@ std::unique_ptr< vector<Array>> Array::getArrayVector() const
 
 		ret->push_back(Array(a, m_backing));
 	}
-		
+
 	return ret;
 }
 
@@ -195,7 +195,7 @@ std::unique_ptr< vector<Table>> Array::getTableVector() const
 
 		ret->push_back(Table(t, m_backing));
 	}
-	
+
 	return ret;
 }
 
@@ -203,7 +203,7 @@ std::unique_ptr< vector<string> > Array::getStringVector() const
 {
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
-	
+
 	auto ret = std::make_unique< vector<string> >();
 	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
@@ -212,7 +212,7 @@ std::unique_ptr< vector<string> > Array::getStringVector() const
 		ret->push_back(p.u.s);
 		toml_myfree(p.u.s);
 	}
-	
+
 	return ret;
 }
 
@@ -221,7 +221,7 @@ std::unique_ptr< vector<bool> > Array::getBoolVector() const
 {
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
-	
+
 	auto ret = std::make_unique< vector<bool> >();
 	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
@@ -238,7 +238,7 @@ std::unique_ptr< vector<int64_t> > Array::getIntVector() const
 {
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
-	
+
 	auto ret = std::make_unique< vector<int64_t> >();
 	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
@@ -255,7 +255,7 @@ std::unique_ptr< vector<Timestamp> > Array::getTimestampVector() const
 {
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
-	
+
 	auto ret = std::make_unique< vector<Timestamp> >();
 	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
@@ -272,7 +272,7 @@ std::unique_ptr< vector<Timestamp> > Array::getTimestampVector() const
 		v.millisec = (ts.millisec ? *ts.millisec : -1);
 		v.z = ts.z ? string(ts.z) : "";
 		toml_myfree(p.u.ts);
-		
+
 		ret->push_back(v);
 	}
 
@@ -284,7 +284,7 @@ std::unique_ptr< vector<double> > Array::getDoubleVector() const
 {
 	int top = toml_array_nelem(m_array);
 	if (top < 0) return 0;
-	
+
 	auto ret = std::make_unique< vector<double> >();
 	ret->reserve(top);
 	for (int i = 0; i < top; i++) {
@@ -301,7 +301,7 @@ int toml::Array::size() const
 {
 	return toml_array_nelem(m_array);
 }
-	
+
 
 toml::Result toml::parse(const string& conf)
 {
@@ -332,4 +332,3 @@ toml::Result toml::parseFile(const string& path)
 	string conf(std::istreambuf_iterator<char>{stream}, {});
 	return toml::parse(conf);
 }
-

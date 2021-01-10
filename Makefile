@@ -15,7 +15,7 @@ ifdef DEBUG
 else
     CFLAGS += -O2 -DNDEBUG
 endif
-CPPFLAGS := $(CFLAGS)
+CXXFLAGS := $(CFLAGS) -std=c++17
 CFLAGS += -std=c99
 
 
@@ -27,7 +27,7 @@ libtomlcpp.a: $(OBJ)
 	ar -rcs $@ $^
 
 libtomlcpp.so: $(OBJ)
-	$(CC) -shared -o $@ $^
+	$(CXX) $(CXXFLAGS) -shared -o $@ $^
 
 toml_json: toml_json.cpp $(LIB)
 

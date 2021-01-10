@@ -29,11 +29,13 @@ int main()
 	}
 
 	// 3. extract values from the top level table
-	auto host = server->getString("host");
-	if (!host.first) {
+	bool ok;
+	std::string host;
+	std::tie(ok, host) = server->getString("host");
+	if (!ok) {
 		fatal("missing or bad host entry");
 	}
-	
+
 	auto portArray = server->getArray("port");
 	if (!portArray) {
 		fatal("missing 'port' array");
@@ -45,7 +47,7 @@ int main()
 	}
 
 	// 4. examine the values
-	cout << "host: " << host.second << "\n";
+	cout << "host: " << host << "\n";
 	cout << "port: ";
 	for (auto p : *port) {
 		cout << p << " ";
