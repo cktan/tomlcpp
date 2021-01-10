@@ -44,3 +44,6 @@ install: all
 
 clean:
 	rm -f *.o $(EXEC) $(LIB) $(LIB_SHARED)
+
+
+.PHONY: all clean install
