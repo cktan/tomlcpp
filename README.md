@@ -3,7 +3,7 @@ TOML in C++; v1.0 compliant.
 
 This is a C++ wrapper around the C library available here: https://github.com/cktan/tomlc99.
 
-* Compatible with [TOML v1.0.0-rc.3](https://toml.io/en/v1.0.0-rc.3).
+* Compatible with [TOML v1.0.0](https://toml.io/en/v1.0.0).
 * Tested with multiple test suites, including
 [BurntSushi/toml-test](https://github.com/BurntSushi/toml-test) and
 [iarna/toml-spec-tests](https://github.com/iarna/toml-spec-tests).
