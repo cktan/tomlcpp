@@ -1,19 +1,19 @@
 /*
   MIT License
-  
+
   Copyright (c) 2020 CK Tan
   https://github.com/cktan/tomlcpp
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -66,11 +66,11 @@ namespace toml {
 
 		// internal
 		Table(toml_table_t* t, std::shared_ptr<Backing> backing) : m_table(t), m_backing(backing) {}
-		
+
 		private:
 		toml_table_t* const m_table = 0;
 		std::shared_ptr<Backing> m_backing;
-		
+
 		Table() = delete;
 	};
 
@@ -80,17 +80,24 @@ namespace toml {
 		public:
 
 		// Content kind
-		// t:table, a:array, v:value
+		// t:table, a:array, v:value, m:mixed
 		char kind() const;
 
 		// For Value kind only, check the type of the value
-		// i:int, d:double, b:bool, s:string, t:time, D: date, T:timestamp, 0:unknown
+		// i:int, d:double, b:bool, s:string, t:time, D: date, T:timestamp, m:mixed, 0:unknown
 		char type() const;
 
 		// Return the #elements in the array
 		int size() const;
 
-		// For values, some conveniet methods to obtain vector of values
+		// You may have to use these for mixed values Arrays
+		pair<bool, string>    getString(int idx) const;
+		pair<bool, bool>      getBool(int idx) const;
+		pair<bool, int64_t>   getInt(int idx) const;
+		pair<bool, double>    getDouble(int idx) const;
+		pair<bool, Timestamp> getTimestamp(int idx) const;
+
+		// For values, some conveniet methods to obtain vector of values for arrays with no mixed values
 		std::unique_ptr< vector<string> >     getStringVector() const;
 		std::unique_ptr< vector<bool> >       getBoolVector() const;
 		std::unique_ptr< vector<int64_t> >    getIntVector() const;
@@ -103,11 +110,11 @@ namespace toml {
 
 		// internal
 		Array(toml_array_t* a, std::shared_ptr<Backing> backing) : m_array(a), m_backing(backing) {}
-		
+
 		private:
 		toml_array_t* const m_array = 0;
 		std::shared_ptr<Backing> m_backing;
-		
+
 		Array() = delete;
 	};
 

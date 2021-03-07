@@ -163,6 +163,55 @@ char Array::type() const
 }
 
 
+pair<bool, string> Array::getString(int idx) const
+{
+	string str;
+	toml_datum_t p = toml_string_at(m_array, idx);
+	if (p.ok) {
+		str = p.u.s;
+		toml_myfree(p.u.s);
+	}
+	return {p.ok, str};
+}
+
+pair<bool, bool> Array::getBool(int idx) const
+{
+	toml_datum_t p = toml_bool_at(m_array, idx);
+	return {p.ok, !!p.u.b};
+}
+
+
+pair<bool, int64_t> Array::getInt(int idx) const
+{
+	toml_datum_t p = toml_int_at(m_array, idx);
+	return {p.ok, p.u.i};
+}
+
+pair<bool, double> Array::getDouble(int idx) const
+{
+	toml_datum_t p = toml_double_at(m_array, idx);
+	return {p.ok, p.u.d};
+}
+
+pair<bool, Timestamp> Array::getTimestamp(int idx) const
+{
+	Timestamp ret;
+	toml_datum_t p = toml_timestamp_at(m_array, idx);
+	if (p.ok) {
+		toml_timestamp_t& ts = *p.u.ts;
+		ret.year = (ts.year ? *ts.year : -1);
+		ret.month = (ts.month ? *ts.month : -1);
+		ret.day = (ts.day ? *ts.day : -1);
+		ret.hour = (ts.hour ? *ts.hour : -1);
+		ret.second = (ts.second ? *ts.second : -1);
+		ret.millisec = (ts.millisec ? *ts.millisec : -1);
+		ret.z = ts.z ? string(ts.z) : "";
+		toml_myfree(p.u.ts);
+	}
+	return {p.ok, ret};
+}
+
+
 std::unique_ptr< vector<Array>> Array::getArrayVector() const
 {
 	int top = toml_array_nelem(m_array);
