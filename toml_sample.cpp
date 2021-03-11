@@ -41,16 +41,14 @@ int main()
 		fatal("missing 'port' array");
 	}
 
-	auto port = portArray->getIntVector();
-	if (!port) {
-		fatal("unable to extract int vector from 'port'");
-	}
-
 	// 4. examine the values
 	cout << "host: " << host << "\n";
 	cout << "port: ";
-	for (auto p : *port) {
-		cout << p << " ";
+	for (int i = 0; ; i++) {
+		auto p = portArray->getInt(i);
+		if (!p.first) break;
+
+		cout << p.second << " ";
 	}
 	cout << "\n";
 

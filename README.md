@@ -64,7 +64,7 @@ int main()
     if (!host.first) {
         error("missing or bad host entry");
     }
-    
+
     auto portArray = server->getArray("port");
     if (!portArray) {
         error("missing 'port' array");
@@ -89,14 +89,14 @@ int main()
 
 ### Parsing
 
-To parse a toml text or file, invoke `toml::parse(text)` or `toml::parseFile(path)`. 
-The return value is a `Result` struct. On success, the `Result.table` will have a non-NULL 
-pointer to the toml table content. Otherwise, the `Result.table` will be NULL, and `Result.errmsg` 
+To parse a toml text or file, invoke `toml::parse(text)` or `toml::parseFile(path)`.
+The return value is a `Result` struct. On success, the `Result.table` will have a non-NULL
+pointer to the toml table content. Otherwise, the `Result.table` will be NULL, and `Result.errmsg`
 stores a string describing the error.
 
 ### Traversing table
 
-Toml tables are key-value maps. 
+Toml tables are key-value maps.
 
 #### Keys
 
@@ -125,26 +125,25 @@ Table::getArray(key)
 
 ### Traversing array
 
-To extract the primitive content of a toml::Array, call one of these methods:
+Similarly, to extract the primitive content of a toml::Array, call one of these methods:
 
 ```
-Array::getStringVector()
-Array::getBoolVector()
-Array::getIntVector()
-Array::getDoubleVector()
-Array::getTimestampVector()
-Array::getArrayVector()
-Array::getTableVector()
+Array::getString(idx)
+Array::getBool(idx)
+Array::getInt(idx)
+Array::getDouble(idx)
+Array::getTimestamp(idx)
+Array::getArray(idx)
+Array::getTable(idx)
 ```
 
-These methods return `unique_ptr` to a C++ `vector`.
 
 ## Building and installing
 
 A normal *make* suffices. You can also simply include the
 `toml.c`, `toml.h`, `tomlcpp.cpp`, `tomlcpp.hpp` files in your project.
 
-Invoking `make install` will install the header and library files into 
+Invoking `make install` will install the header and library files into
 /usr/local/{include,lib}.
 
 Alternatively, specify `make install prefix=/a/file/path` to install into

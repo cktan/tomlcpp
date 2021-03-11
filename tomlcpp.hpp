@@ -90,14 +90,18 @@ namespace toml {
 		// Return the #elements in the array
 		int size() const;
 
-		// You may have to use these for mixed values Arrays
+		// You may have to use these methods for arrays with mixed values
 		pair<bool, string>    getString(int idx) const;
 		pair<bool, bool>      getBool(int idx) const;
 		pair<bool, int64_t>   getInt(int idx) const;
 		pair<bool, double>    getDouble(int idx) const;
 		pair<bool, Timestamp> getTimestamp(int idx) const;
 
-		// For values, some conveniet methods to obtain vector of values for arrays with no mixed values
+		std::unique_ptr<Table> getTable(int idx) const;
+		std::unique_ptr<Array> getArray(int idx) const;
+
+		// Use these methods only if you know the array has no mixed values!
+		// For values, some conveniet methods to obtain vector
 		std::unique_ptr< vector<string> >     getStringVector() const;
 		std::unique_ptr< vector<bool> >       getBoolVector() const;
 		std::unique_ptr< vector<int64_t> >    getIntVector() const;

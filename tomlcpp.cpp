@@ -211,6 +211,25 @@ pair<bool, Timestamp> Array::getTimestamp(int idx) const
 	return {p.ok, ret};
 }
 
+std::unique_ptr<Array> Array::getArray(int idx) const
+{
+	toml_array_t* a = toml_array_at(m_array, idx);
+	if (!a)
+		return 0;
+
+	auto ret = std::make_unique<Array>(a, m_backing);
+	return ret;
+}
+
+std::unique_ptr<Table> Array::getTable(int idx) const
+{
+	toml_table_t* t = toml_table_at(m_array, idx);
+	if (!t)
+		return 0;
+
+	auto ret = std::make_unique<Table>(t, m_backing);
+	return ret;
+}
 
 std::unique_ptr< vector<Array>> Array::getArrayVector() const
 {
