@@ -78,7 +78,7 @@ int main()
         if (!p.first) break;
 
         cout << p.second << " ";
-	}
+    }
     cout << "\n";
 
     return 0;
