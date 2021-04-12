@@ -288,8 +288,9 @@ struct toml_array_t {
 
 
 struct toml_table_t {
-	const char* key;		/* key to this table */
+	const char* key;	/* key to this table */
 	bool implicit;		/* table was created implicitly */
+	bool readonly;		/* no more modification allowed */
 
 	/* key-values in the table */
 	int			nkval;
@@ -388,6 +389,12 @@ static int e_badkey(context_t* ctx, int lineno)
 static int e_keyexists(context_t* ctx, int lineno)
 {
 	snprintf(ctx->errbuf, ctx->errbufsz, "line %d: key exists", lineno);
+	return -1;
+}
+
+static int e_forbid(context_t* ctx, int lineno, const char* msg)
+{
+	snprintf(ctx->errbuf, ctx->errbufsz, "line %d: %s", lineno, msg);
 	return -1;
 }
 
@@ -926,7 +933,7 @@ static inline int eat_token(context_t* ctx, tokentype_t typ, int isdotspecial, c
 /* We are at '{ ... }'.
  * Parse the table.
  */
-static int parse_table(context_t* ctx, toml_table_t* tab)
+static int parse_inline_table(context_t* ctx, toml_table_t* tab)
 {
 	if (eat_token(ctx, LBRACE, 1, FLINE))
 		return -1;
@@ -959,6 +966,9 @@ static int parse_table(context_t* ctx, toml_table_t* tab)
 
 	if (eat_token(ctx, RBRACE, 1, FLINE))
 		return -1;
+
+	tab->readonly = 1;
+
 	return 0;
 }
 
@@ -1045,7 +1055,7 @@ static int parse_array(context_t* ctx, toml_array_t* arr)
 
 				toml_table_t* subtab = create_table_in_array(ctx, arr);
 				if (!subtab) return -1;
-				if (parse_table(ctx, subtab)) return -1;
+				if (parse_inline_table(ctx, subtab)) return -1;
 				break;
 			}
 
@@ -1075,6 +1085,10 @@ static int parse_array(context_t* ctx, toml_array_t* arr)
 */
 static int parse_keyval(context_t* ctx, toml_table_t* tab)
 {
+	if (tab->readonly) {
+		return e_forbid(ctx, ctx->tok.lineno, "cannot insert new entry into existing table");
+	}
+
 	token_t key = ctx->tok;
 	if (eat_token(ctx, STRING, 1, FLINE)) return -1;
 
@@ -1135,7 +1149,7 @@ static int parse_keyval(context_t* ctx, toml_table_t* tab)
 		{ /* key = { table } */
 			toml_table_t* nxttab = create_keytable_in_table(ctx, tab, key);
 			if (!nxttab) return -1;
-			if (parse_table(ctx, nxttab)) return -1;
+			if (parse_inline_table(ctx, nxttab)) return -1;
 			return 0;
 		}
 
@@ -1666,7 +1680,6 @@ static int scan_string(context_t* ctx, char* p, int lineno, int dotisspecial)
 	}
 
 	if ('\"' == *p) {
-		char* tsq = strstr(p, "\'\'\'");
 		int hexreq = 0;		/* #hex required */
 		int escape = 0;
 		for (p++; *p; p++) {
@@ -1683,15 +1696,17 @@ static int scan_string(context_t* ctx, char* p, int lineno, int dotisspecial)
 				return e_syntax(ctx, lineno, "expect hex char");
 			}
 			if (*p == '\\') { escape = 1; continue; }
+			if (*p == '\'') {
+				if (p[1] == '\'' && p[2] == '\'') {
+					return e_syntax(ctx, lineno, "triple-s-quote inside string lit");
+				}
+				continue;
+			}
 			if (*p == '\n') break;
-			if (*p == '"') break;
+			if (*p == '"')  break;
 		}
 		if (*p != '"') {
 			return e_syntax(ctx, lineno, "unterminated quote");
-		}
-
-		if (tsq && tsq < p) {
-			return e_syntax(ctx, lineno, "triple-s-quote inside string lit");
 		}
 
 		set_token(ctx, STRING, lineno, orig, p + 1 - orig);
