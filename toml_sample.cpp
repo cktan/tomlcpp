@@ -29,9 +29,7 @@ int main()
 	}
 
 	// 3. extract values from the top level table
-	bool ok;
-	std::string host;
-	std::tie(ok, host) = server->getString("host");
+	auto [ ok, host ] = server->getString("host");
 	if (!ok) {
 		fatal("missing or bad host entry");
 	}
