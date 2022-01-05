@@ -29,9 +29,7 @@ libtomlcpp.a: $(OBJ)
 libtomlcpp.so: $(OBJ)
 	$(CXX) $(CXXFLAGS) -shared -o $@ $^
 
-toml_json: toml_json.cpp $(LIB)
-
-toml_sample: toml_sample.cpp $(LIB)
+$(EXEC): $(LIB)
 
 prefix ?= /usr/local
 
@@ -45,5 +43,7 @@ install: all
 clean:
 	rm -f *.o $(EXEC) $(LIB) $(LIB_SHARED)
 
+format:
+	clang-format -i $(shell find . -name '*.[ch]') $(shell find . -name '*.[ch]pp')
 
-.PHONY: all clean install
+.PHONY: all clean install format
