@@ -39,10 +39,10 @@
 #include <string>
 #include <vector>
 
-using std::cout;
 using std::cerr;
-using std::string;
+using std::cout;
 using std::pair;
+using std::string;
 
 static void print_escape_string(const string &str) {
   for (char ch : str) {

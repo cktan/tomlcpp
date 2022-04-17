@@ -25,6 +25,10 @@
 #ifndef TOML_HPP
 #define TOML_HPP
 
+#include <memory>
+#include <string>
+#include <vector>
+
 struct toml_table_t;
 struct toml_array_t;
 
@@ -131,6 +135,6 @@ struct Result {
 
 Result parse(const string &conf);
 Result parseFile(const string &path);
-};
+}; // namespace toml
 
 #endif /* TOML_HPP */

@@ -1,9 +1,5 @@
 #include "tomlcpp.hpp"
 #include <iostream>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
 using std::cerr;
 using std::cout;
@@ -27,7 +23,7 @@ int main() {
   }
 
   // 3. extract values from the top level table
-  auto[ok, host] = server->getString("host");
+  auto [ok, host] = server->getString("host");
   if (!ok) {
     fatal("missing or bad host entry");
   }

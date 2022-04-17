@@ -26,15 +26,13 @@
 */
 #include "tomlcpp.hpp"
 #include "toml.h"
+#include <cstring>
 #include <fstream>
-#include <memory>
-#include <string.h>
-#include <vector>
 
 using namespace toml;
+using std::pair;
 using std::string;
 using std::vector;
-using std::pair;
 
 static void *toml_mymalloc(size_t sz) { return new char[sz]; }
 
