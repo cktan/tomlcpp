@@ -96,6 +96,7 @@ pair<bool, Timestamp> Table::getTimestamp(const string &key) const {
     ret.month = (ts.month ? *ts.month : -1);
     ret.day = (ts.day ? *ts.day : -1);
     ret.hour = (ts.hour ? *ts.hour : -1);
+    ret.minute = (ts.minute ? *ts.minute : -1);
     ret.second = (ts.second ? *ts.second : -1);
     ret.millisec = (ts.millisec ? *ts.millisec : -1);
     ret.z = ts.z ? string(ts.z) : "";
