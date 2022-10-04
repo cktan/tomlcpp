@@ -24,7 +24,7 @@ all: $(LIB) $(LIB_SHARED) $(EXEC)
 *.o: $(HFILES)
 
 libtomlcpp.a: $(OBJ)
-	ar -rcs $@ $^
+	$(AR) -rcs $@ $^
 
 libtomlcpp.so: $(OBJ)
 	$(CXX) $(CXXFLAGS) -shared -o $@ $^
