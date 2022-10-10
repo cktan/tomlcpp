@@ -138,6 +138,7 @@ Array::getTable(idx)
 
 ## Building and installing
 
+### Make
 A normal *make* suffices. You can also simply include the
 `toml.c`, `toml.h`, `tomlcpp.cpp`, `tomlcpp.hpp` files in your project.
 
@@ -146,3 +147,38 @@ Invoking `make install` will install the header and library files into
 
 Alternatively, specify `make install prefix=/a/file/path` to install into
 /a/file/path/{include,lib}.
+
+### Meson
+`meson` is a modern build tool that a separate build tree and has cleaner directives for dependency declaration (amongst many other features). To build with `meson`, you will need to have both `meson` and `ninja` installed.
+
+You will then specify a build tree where the output goes, as the command line option to meson
+
+```
+$ meson ./build
+The Meson build system
+Version: 0.63.3
+Source dir: /code/tomlcpp
+Build dir: /code/tomlcpp/build
+Build type: native build
+Project name: tomlcpp
+Project version: undefined
+C compiler for the host machine: cc (clang 11.0.0 "Apple clang version 11.0.0 (clang-1100.0.33.17)")
+C linker for the host machine: cc ld64 530
+C++ compiler for the host machine: c++ (clang 11.0.0 "Apple clang version 11.0.0 (clang-1100.0.33.17)")
+C++ linker for the host machine: c++ ld64 530
+Host machine cpu family: x86_64
+Host machine cpu: x86_64
+Build targets in project: 3
+
+Found ninja-1.10.2 at /usr/local/bin/ninja
+$ cd build
+$ ninja
+[1/8] Compiling C object libtomlcpp.dylib.p/toml.c.o
+[2/8] Compiling C++ object toml_sample.p/toml_sample.cpp.o
+[3/8] Compiling C++ object toml_json.p/toml_json.cpp.o
+[4/8] Compiling C++ object libtomlcpp.dylib.p/tomlcpp.cpp.o
+[5/8] Linking target libtomlcpp.dylib
+[6/8] Generating symbol file libtomlcpp.dylib.p/libtomlcpp.dylib.symbols
+[7/8] Linking target toml_sample
+[8/8] Linking target toml_json
+```
